@@ -129,7 +129,7 @@ const html = `<!DOCTYPE html>
     <div class="brand-divider"></div>
     <div class="eyebrow">Calidad &amp; Capacitacion</div>
   </div>
-  <h1>Dashboard de Calidad — COBRA</h1>
+  <h1>Dashboard de Calidad</h1>
   <div class="subtitle">Elige el informe que quieres revisar.</div>
 </header>
 
