@@ -146,8 +146,6 @@ const html = `<!DOCTYPE html>
   </div>
 </main>
 
-<footer>Generado automaticamente por generar_indice.js</footer>
-
 </body>
 </html>`;
 
