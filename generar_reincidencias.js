@@ -986,7 +986,7 @@ async function main() {
     <div class="brand-divider"></div>
     <div class="eyebrow">Calidad &amp; Capacitacion · Analisis de Averias Reiteradas</div>
   </div>
-  <h1>Informe de Repetido Reparado — COBRA</h1>
+  <h1>Informe de Repetido Reparado</h1>
   <div class="subtitle" id="heroSubtitle">Analisis de reparaciones de Fibra Optica que volvieron a fallar dentro de 30 dias, a partir de las reparaciones registradas por COBRA. Incluye tasa de reincidencia por agencia, causa y tecnico, tiempos hasta la reiteracion, y si el reitero lo resolvio el mismo tecnico u otro.</div>
   <div class="meta-row" id="metaRow"></div>
   <div class="archive-row no-print" id="archiveRow"></div>
