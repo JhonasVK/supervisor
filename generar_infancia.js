@@ -124,10 +124,10 @@ async function main() {
   console.log('Archivo origen:', csvPath);
 
   const rows = leerCsv(csvPath);
-  // Solo las instalaciones (tipo "A" = Alta) cuentan como base para la tasa de infancia.
-  // El archivo tambien trae Reparaciones (R) y Traslados (T), que no son instalaciones
-  // y quedan fuera del calculo para no inflar el denominador.
-  const instalaciones = rows.filter((r) => (r['vpi_tipo_trabajo_producto'] || '').trim() === 'A');
+  // Las instalaciones (Alta) y los traslados (T, tambien involucran una reconexion
+  // fisica) cuentan como base para la tasa de infancia. Las Reparaciones (R) no,
+  // porque no son una instalacion y quedan fuera del calculo.
+  const instalaciones = rows.filter((r) => ['A', 'T'].includes((r['vpi_tipo_trabajo_producto'] || '').trim()));
   const inf = instalaciones.filter((r) => (r['infancia'] || '').trim() === '1');
 
   inf.sort((a, b) => {
@@ -137,7 +137,7 @@ async function main() {
     return (a['toa_xa_order_creation_date'] || '').localeCompare(b['toa_xa_order_creation_date'] || '');
   });
 
-  console.log('Total registros:', rows.length, '| Instalaciones (tipo A):', instalaciones.length, '| Averias de infancia:', inf.length);
+  console.log('Total registros:', rows.length, '| Instalaciones (Alta+Traslado):', instalaciones.length, '| Averias de infancia:', inf.length);
 
   // ================== EXCEL ==================
   const columns = [
@@ -490,7 +490,7 @@ async function main() {
     'Archivo origen: ' + path.basename(csvPath),
     'Generado: ' + new Date().toLocaleString('es-CL'),
     '',
-    'Una "averia de infancia" es una instalacion (Alta) que genero una reparacion (rmdy_*) dentro de su periodo de infancia, segun el campo "infancia" del archivo origen (1 = tuvo reparacion de infancia). El archivo tambien trae Reparaciones (R) y Traslados (T), que no son instalaciones y quedan fuera de este calculo (no se usan como base de la tasa).',
+    'Una "averia de infancia" es una instalacion o traslado (Alta o Traslado) que genero una reparacion (rmdy_*) dentro de su periodo de infancia, segun el campo "infancia" del archivo origen (1 = tuvo reparacion de infancia). El archivo tambien trae Reparaciones (R), que no son una instalacion y quedan fuera de este calculo (no se usan como base de la tasa).',
     '',
     '- "Mismo Tecnico?": indica si el tecnico que atendio la reparacion de infancia es el mismo que hizo la instalacion original.',
     '- Filas resaltadas en ROJO en "Infancia Detalle": la reparacion de infancia la atendio el MISMO tecnico que instalo (posible senal de instalacion mal hecha).',
@@ -503,7 +503,7 @@ async function main() {
     'Hoja "Mismo Tecnico": de las averias de infancia, indica si la atendio el MISMO tecnico que instalo o uno DISTINTO. Un % alto sugiere que el propio instalador detecto y corrigio su error; un % bajo sugiere que otro tecnico tuvo que corregirlo.',
     '',
     'Total de registros en el archivo origen (Altas + Reparaciones + Traslados): ' + rows.length,
-    'Total de instalaciones (tipo Alta, base del calculo): ' + instalaciones.length,
+    'Total de instalaciones (Altas + Traslados, base del calculo): ' + instalaciones.length,
     'Total de averias de infancia detectadas: ' + inf.length,
     '',
     'Para actualizar: reemplaza/sobreescribe el CSV en la carpeta bbdd\\ con los datos nuevos y vuelve a ejecutar Generar_Reporte_Reincidencias.bat. Cada ejecucion genera un archivo Excel nuevo (no sobreescribe reportes anteriores) y actualiza Dashboard_Infancia.html.',
