@@ -154,7 +154,7 @@ const html = `<!DOCTYPE html>
       meses: mesesInfancia.length,
     })}
     ${tarjetaExterna({
-      href: 'https://jhonasvk.github.io/dashboard-auditorias/',
+      href: 'https://jhonasvk.github.io/dashboard-auditorias-tigo/',
       icono: '🧾',
       titulo: 'Auditorias de Terreno',
       descripcion: 'Dashboard de auditorias en terreno: nota promedio por tecnico, top hallazgos e incumplimientos por supervisor.',
