@@ -942,6 +942,37 @@ Chart.defaults.color = fontColor;
 Chart.defaults.borderColor = 'rgba(20,50,80,0.06)';
 Chart.defaults.font.family = "'Segoe UI', Arial, sans-serif";
 
+// Plugin liviano: dibuja el valor al final de cada barra (sin depender de librerias externas).
+const valueLabelsPlugin = {
+  id: 'valueLabels',
+  afterDatasetsDraw(chart) {
+    const opts = (chart.options.plugins && chart.options.plugins.valueLabels) || {};
+    if (opts.display === false) return;
+    const formatter = opts.formatter || ((v) => v);
+    const meta = chart.getDatasetMeta(opts.datasetIndex || 0);
+    if (!meta || meta.hidden) return;
+    const ctx = chart.ctx;
+    ctx.save();
+    ctx.font = '600 11px Segoe UI, Arial, sans-serif';
+    ctx.fillStyle = '#22303f';
+    meta.data.forEach((bar, i) => {
+      const raw = chart.data.datasets[opts.datasetIndex || 0].data[i];
+      if (raw === null || raw === undefined) return;
+      const label = formatter(raw);
+      if (chart.options.indexAxis === 'y') {
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(label, bar.x + 6, bar.y);
+      } else {
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(label, bar.x, bar.y - 4);
+      }
+    });
+    ctx.restore();
+  }
+};
+
 const metaGap = +(DATA.tasaGlobal - DATA.meta).toFixed(1);
 const metaSub = metaGap <= 0
   ? \`<span style="color:var(--promotor)">▼ \${Math.abs(metaGap)} pts bajo la meta (\${DATA.meta}%) — cumple</span>\`
@@ -956,6 +987,7 @@ document.getElementById('kpiGrid').innerHTML = \`
 
 new Chart(document.getElementById('chartAgencia'), {
   type: 'bar',
+  plugins: [valueLabelsPlugin],
   data: {
     labels: DATA.agencias.map(a=>a.agencia),
     datasets: [
@@ -963,7 +995,7 @@ new Chart(document.getElementById('chartAgencia'), {
       { label:'Meta ('+DATA.meta+'%)', data: DATA.agencias.map(()=>DATA.meta), type:'line', borderColor:'#e2523e', borderDash:[5,4], borderWidth:1.5, pointRadius:0, tension:0 }
     ]
   },
-  options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'top', labels:{boxWidth:10} } }, scales:{ y:{ min:0, title:{display:true,text:'Tasa %'}, grid:{color:'rgba(20,50,80,0.06)'} } } }
+  options: { responsive:true, maintainAspectRatio:false, layout:{ padding:{ top:20 } }, plugins:{ legend:{ position:'top', labels:{boxWidth:10} }, valueLabels:{ formatter:(v)=>v+'%' } }, scales:{ y:{ min:0, title:{display:true,text:'Tasa %'}, grid:{color:'rgba(20,50,80,0.06)'} } } }
 });
 let rowsAg = '<tr><th>Agencia</th><th>Tasa</th><th>vs. Meta</th><th>Instalaciones</th></tr>';
 DATA.agencias.slice().sort((a,b)=>a.tasa-b.tasa).forEach(a=>{
@@ -979,6 +1011,7 @@ document.getElementById('agenciaCallout').innerHTML = agSobreMeta.length
 
 new Chart(document.getElementById('chartProducto'), {
   type: 'bar',
+  plugins: [valueLabelsPlugin],
   data: {
     labels: DATA.productos.map(p=>p.producto),
     datasets: [
@@ -986,7 +1019,7 @@ new Chart(document.getElementById('chartProducto'), {
       { label:'Meta ('+DATA.meta+'%)', data: DATA.productos.map(()=>DATA.meta), type:'line', borderColor:'#e2523e', borderDash:[5,4], borderWidth:1.5, pointRadius:0, tension:0 }
     ]
   },
-  options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'top', labels:{boxWidth:10} } }, scales:{ y:{ min:0, title:{display:true,text:'Tasa %'}, grid:{color:'rgba(20,50,80,0.06)'} } } }
+  options: { responsive:true, maintainAspectRatio:false, layout:{ padding:{ top:20 } }, plugins:{ legend:{ position:'top', labels:{boxWidth:10} }, valueLabels:{ formatter:(v)=>v+'%' } }, scales:{ y:{ min:0, title:{display:true,text:'Tasa %'}, grid:{color:'rgba(20,50,80,0.06)'} } } }
 });
 let rowsPr = '<tr><th>Producto</th><th>Tasa</th><th>Infancia</th><th>Total</th></tr>';
 DATA.productos.slice().sort((a,b)=>b.tasa-a.tasa).forEach(p=>{
@@ -998,11 +1031,12 @@ document.getElementById('productoCallout').innerHTML = peorPr ? \`<b>Foco princi
 
 new Chart(document.getElementById('chartCausa'), {
   type: 'bar',
+  plugins: [valueLabelsPlugin],
   data: {
     labels: DATA.causas.map(c=>c.causa),
     datasets: [{ label:'% de averias de infancia', data: DATA.causas.map(c=>c.pct), backgroundColor:'rgba(0,113,206,0.85)', borderRadius:5, maxBarThickness:26 }]
   },
-  options: { indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ x:{ min:0, title:{display:true,text:'% de casos'}, grid:{color:'rgba(20,50,80,0.06)'} } } }
+  options: { indexAxis:'y', responsive:true, maintainAspectRatio:false, layout:{ padding:{ right:40 } }, plugins:{ legend:{ display:false }, valueLabels:{ formatter:(v)=>v+'%' } }, scales:{ x:{ min:0, title:{display:true,text:'% de casos'}, grid:{color:'rgba(20,50,80,0.06)'} } } }
 });
 let rowsCl = '<tr><th>Clave</th><th>Casos</th><th>%</th></tr>';
 DATA.claves.forEach(c=>{ rowsCl += \`<tr><td>\${c.clave}</td><td>\${c.count}</td><td>\${c.pct}%</td></tr>\`; });
@@ -1010,8 +1044,9 @@ document.getElementById('tablaClave').innerHTML = rowsCl;
 
 new Chart(document.getElementById('chartDias'), {
   type: 'bar',
+  plugins: [valueLabelsPlugin],
   data: { labels: DATA.diasBuckets.map(b=>b.label), datasets: [{ label:'Casos', data: DATA.diasBuckets.map(b=>b.count), backgroundColor:'rgba(0,113,206,0.85)', borderRadius:6, maxBarThickness:60 }] },
-  options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ min:0, title:{display:true,text:'N° de casos'}, grid:{color:'rgba(20,50,80,0.06)'} } } }
+  options: { responsive:true, maintainAspectRatio:false, layout:{ padding:{ top:20 } }, plugins:{ legend:{ display:false }, valueLabels:{} }, scales:{ y:{ min:0, title:{display:true,text:'N° de casos'}, grid:{color:'rgba(20,50,80,0.06)'} } } }
 });
 document.getElementById('tablaDias').innerHTML = \`
   <tr><th>Indicador</th><th>Valor</th></tr>

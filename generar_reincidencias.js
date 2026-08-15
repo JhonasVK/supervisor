@@ -1120,6 +1120,37 @@ Chart.defaults.color = fontColor;
 Chart.defaults.borderColor = 'rgba(20,50,80,0.06)';
 Chart.defaults.font.family = "'Segoe UI', Arial, sans-serif";
 
+// Plugin liviano: dibuja el valor al final de cada barra (sin depender de librerias externas).
+const valueLabelsPlugin = {
+  id: 'valueLabels',
+  afterDatasetsDraw(chart) {
+    const opts = (chart.options.plugins && chart.options.plugins.valueLabels) || {};
+    if (opts.display === false) return;
+    const formatter = opts.formatter || ((v) => v);
+    const meta = chart.getDatasetMeta(opts.datasetIndex || 0);
+    if (!meta || meta.hidden) return;
+    const ctx = chart.ctx;
+    ctx.save();
+    ctx.font = '600 11px Segoe UI, Arial, sans-serif';
+    ctx.fillStyle = '#22303f';
+    meta.data.forEach((bar, i) => {
+      const raw = chart.data.datasets[opts.datasetIndex || 0].data[i];
+      if (raw === null || raw === undefined) return;
+      const label = formatter(raw);
+      if (chart.options.indexAxis === 'y') {
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(label, bar.x + 6, bar.y);
+      } else {
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(label, bar.x, bar.y - 4);
+      }
+    });
+    ctx.restore();
+  }
+};
+
 // ---- KPI cards ----
 const metaGap = +(DATA.tasaGlobal - DATA.meta).toFixed(1);
 const metaSub = metaGap <= 0
@@ -1136,6 +1167,7 @@ document.getElementById('kpiGrid').innerHTML = \`
 // ---- Chart 01: Agencia ----
 new Chart(document.getElementById('chartAgencia'), {
   type: 'bar',
+  plugins: [valueLabelsPlugin],
   data: {
     labels: DATA.agencias.map(a=>a.agencia),
     datasets: [
@@ -1145,7 +1177,8 @@ new Chart(document.getElementById('chartAgencia'), {
   },
   options: {
     responsive:true, maintainAspectRatio:false,
-    plugins:{ legend:{ position:'top', labels:{boxWidth:10} } },
+    layout:{ padding:{ top:20 } },
+    plugins:{ legend:{ position:'top', labels:{boxWidth:10} }, valueLabels:{ formatter:(v)=>v+'%' } },
     scales:{ y:{ min:0, title:{display:true,text:'Tasa %'}, grid:{color:'rgba(20,50,80,0.06)'} } }
   }
 });
@@ -1164,6 +1197,7 @@ document.getElementById('agenciaCallout').innerHTML = agBajoMeta.length
 // ---- Chart 02: Causa ----
 new Chart(document.getElementById('chartCausa'), {
   type: 'bar',
+  plugins: [valueLabelsPlugin],
   data: {
     labels: DATA.causas.map(c=>c.causa),
     datasets: [
@@ -1173,7 +1207,8 @@ new Chart(document.getElementById('chartCausa'), {
   },
   options: {
     indexAxis:'y', responsive:true, maintainAspectRatio:false,
-    plugins:{ legend:{ position:'top', labels:{boxWidth:10} } },
+    layout:{ padding:{ right:40 } },
+    plugins:{ legend:{ position:'top', labels:{boxWidth:10} }, valueLabels:{ formatter:(v)=>v+'%' } },
     scales:{ x:{ min:0, title:{display:true,text:'Tasa %'}, grid:{color:'rgba(20,50,80,0.06)'} } }
   }
 });
@@ -1191,6 +1226,7 @@ document.getElementById('causaCallout').innerHTML = peorCausaC
 const subOrd = DATA.subcausas.slice().sort((a,b)=>b.tasa-a.tasa);
 new Chart(document.getElementById('chartSubcausa'), {
   type: 'bar',
+  plugins: [valueLabelsPlugin],
   data: {
     labels: subOrd.map(s=>s.subcausa),
     datasets: [
@@ -1200,7 +1236,8 @@ new Chart(document.getElementById('chartSubcausa'), {
   },
   options: {
     indexAxis:'y', responsive:true, maintainAspectRatio:false,
-    plugins:{ legend:{ position:'top', labels:{boxWidth:10} } },
+    layout:{ padding:{ right:40 } },
+    plugins:{ legend:{ position:'top', labels:{boxWidth:10} }, valueLabels:{ formatter:(v)=>v+'%' } },
     scales:{ x:{ min:0, title:{display:true,text:'Tasa %'}, grid:{color:'rgba(20,50,80,0.06)'} } }
   }
 });
@@ -1208,6 +1245,7 @@ new Chart(document.getElementById('chartSubcausa'), {
 // ---- Chart 04: Dias hasta reiteracion ----
 new Chart(document.getElementById('chartDias'), {
   type: 'bar',
+  plugins: [valueLabelsPlugin],
   data: {
     labels: DATA.diasBuckets.map(b=>b.label),
     datasets: [
@@ -1216,7 +1254,8 @@ new Chart(document.getElementById('chartDias'), {
   },
   options: {
     responsive:true, maintainAspectRatio:false,
-    plugins:{ legend:{ display:false } },
+    layout:{ padding:{ top:20 } },
+    plugins:{ legend:{ display:false }, valueLabels:{} },
     scales:{ y:{ min:0, title:{display:true,text:'N° de casos'}, grid:{color:'rgba(20,50,80,0.06)'} } }
   }
 });
