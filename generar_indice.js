@@ -72,7 +72,7 @@ const html = `<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Informes COBRA · Indice</title>
+<title>Informe de Calidad · COBRA</title>
 <style>
   :root{
     --bg:#eef1f4; --panel:#ffffff; --border:#e0e5ea; --text:#22303f; --text-dim:#6b7a8c;
@@ -119,7 +119,7 @@ const html = `<!DOCTYPE html>
     <div class="brand-divider"></div>
     <div class="eyebrow">Calidad &amp; Capacitacion</div>
   </div>
-  <h1>Informes COBRA</h1>
+  <h1>Informe de Calidad — COBRA</h1>
   <div class="subtitle">Elige el informe que quieres revisar.</div>
 </header>
 
