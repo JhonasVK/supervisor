@@ -83,7 +83,7 @@ echo   Listo! Informes actualizados y publicados
 echo ========================================================
 echo.
 echo  Local:  abre index.html con doble clic
-echo  Web:    https://jhonasvk.github.io/informe-averias/
+echo  Web:    https://jhonasvk.github.io/supervisor/
 echo  (la version web tarda ~1 minuto en actualizarse)
 echo.
 pause
