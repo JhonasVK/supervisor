@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Informe de Averias de Infancia · COBRA</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#eef1f4;
+    --panel:#ffffff;
+    --panel-2:#f5f7f9;
+    --border:#e0e5ea;
+    --text:#22303f;
+    --text-dim:#6b7a8c;
+    --cobra-navy:#003c71;
+    --cobra-blue:#0071ce;
+    --celeste:#29a9e0;
+    --celeste-soft:#e8f6fd;
+    --promotor:#1fa971;
+    --neutro:#e2962e;
+    --detractor:#e2523e;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+  }
+  header.hero{
+    background:linear-gradient(120deg,#ffffff 0%,var(--celeste-soft) 55%,#dcf1fb 100%);
+    padding:34px 6vw 40px;
+    position:relative;
+    overflow:hidden;
+    border-bottom:4px solid var(--celeste);
+  }
+  header.hero::after{
+    content:"";
+    position:absolute; right:-100px; top:-100px;
+    width:340px; height:340px; border-radius:50%;
+    background:radial-gradient(circle, rgba(41,169,224,0.18), transparent 70%);
+  }
+  .brand-row{ display:flex; align-items:center; gap:18px; margin-bottom:22px; }
+  .brand-row img{ height:46px; }
+  .brand-divider{ width:1px; height:34px; background:var(--border); }
+  .eyebrow{ text-transform:uppercase; letter-spacing:.14em; font-size:12.5px; color:var(--celeste); font-weight:800; }
+  h1{ margin:0 0 6px; font-size:clamp(26px,4vw,38px); font-weight:800; letter-spacing:-0.01em; color:var(--cobra-navy); }
+  .subtitle{ color:#3a4a5c; font-size:15px; max-width:660px; line-height:1.55; }
+  .meta-row{ display:flex; gap:22px; flex-wrap:wrap; margin-top:22px; font-size:13px; color:#3a4a5c; }
+  .meta-row span b{color:var(--cobra-navy);}
+  .back-link{ display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:var(--cobra-navy); text-decoration:none; margin-bottom:14px; }
+  .back-link:hover{ text-decoration:underline; }
+  main{ padding:36px 6vw 80px; max-width:1280px; margin:0 auto; }
+
+  .kpi-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:16px; margin:-58px 0 34px; position:relative; z-index:2; }
+  .kpi-card{ background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:20px 20px 18px; box-shadow:0 10px 24px rgba(20,50,80,.08); }
+  .kpi-card .label{ font-size:11.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-dim); font-weight:700; margin-bottom:8px; }
+  .kpi-card .value{ font-size:30px; font-weight:800; line-height:1; color:var(--cobra-navy); }
+  .kpi-card .value.hl{ color:var(--celeste); }
+  .kpi-card .sub{ font-size:12px; color:var(--text-dim); margin-top:6px; }
+
+  section{ margin-bottom:44px; }
+  .section-title{ display:flex; align-items:baseline; gap:10px; margin-bottom:6px; }
+  .section-title .num{ font-size:13px; font-weight:800; color:var(--celeste); background:rgba(41,169,224,0.12); border:1px solid rgba(41,169,224,.35); border-radius:6px; padding:2px 8px; }
+  .section-title h2{ margin:0; font-size:20px; font-weight:750; color:var(--cobra-navy); }
+  .section-desc{ color:var(--text-dim); font-size:13.5px; margin:0 0 18px; max-width:820px; line-height:1.55;}
+
+  .panel{ background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:22px 24px 14px; box-shadow:0 4px 14px rgba(20,50,80,.05); }
+  .grid-2{ display:grid; grid-template-columns:1.35fr .95fr; gap:18px; }
+  @media (max-width:880px){ .grid-2{grid-template-columns:1fr;} }
+
+  table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  th{ text-align:left; color:var(--text-dim); font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; padding:10px 10px; border-bottom:1px solid var(--border); }
+  td{ padding:10px; border-bottom:1px solid var(--panel-2); }
+  tr:hover td{ background:var(--panel-2); }
+  .badge{ display:inline-block; padding:2px 9px; border-radius:20px; font-size:11.5px; font-weight:700; }
+  .badge.hi{ background:rgba(31,169,113,.12); color:var(--promotor); }
+  .badge.mid{ background:rgba(226,150,46,.14); color:var(--neutro); }
+  .badge.lo{ background:rgba(226,82,62,.12); color:var(--detractor); }
+
+  .callout{ border-left:3px solid var(--celeste); background:linear-gradient(90deg, var(--celeste-soft), transparent); padding:14px 18px; border-radius:0 10px 10px 0; font-size:13.5px; color:#2c3e50; line-height:1.6; }
+  .callout.warn{ border-left-color:var(--neutro); background:linear-gradient(90deg, rgba(226,150,46,.10), transparent); }
+
+  .rec-list{ display:grid; gap:10px; margin-top:8px; }
+  .rec-item{ display:flex; gap:12px; align-items:flex-start; background:var(--panel-2); border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
+  .rec-item .idx{ flex:none; width:26px; height:26px; border-radius:50%; background:var(--celeste); color:#fff; font-weight:800; font-size:12.5px; display:flex; align-items:center; justify-content:center; }
+  .rec-item p{ margin:0; font-size:13.5px; color:#334252; line-height:1.55; }
+  .rec-item strong{ color:var(--cobra-navy); }
+
+  .perf-grid{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:880px){ .perf-grid{grid-template-columns:1fr;} }
+  .perf-col-title{ font-size:13px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+  .perf-col-title.top{ color:var(--promotor); }
+  .perf-col-title.bottom{ color:var(--detractor); }
+  .tech-card{ background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:16px 18px; margin-bottom:12px; box-shadow:0 3px 10px rgba(20,50,80,.04); }
+  .tech-card.bottom-card{ border-left:4px solid var(--detractor); }
+  .tech-card.top-card{ border-left:4px solid var(--promotor); }
+  .tech-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .tech-name{ font-weight:750; font-size:14px; color:var(--cobra-navy); }
+  .tech-nps{ font-weight:800; font-size:15px; }
+  .tech-nps.lo{ color:var(--detractor); }
+  .tech-nps.hi{ color:var(--promotor); }
+  .tech-meta{ font-size:12px; color:var(--text-dim); margin-bottom:8px; }
+  .tech-quote{ font-size:12.5px; color:#4a5a6b; font-style:italic; margin-top:8px; background:var(--panel-2); border-radius:8px; padding:8px 10px; border-left:2px solid var(--border); }
+
+  footer{ text-align:center; padding:26px; color:var(--text-dim); font-size:12px; border-top:1px solid var(--border); }
+  canvas{ max-width:100%; }
+
+  .export-pdf-btn{
+    position:fixed; top:18px; right:18px; z-index:50;
+    display:flex; align-items:center; gap:8px;
+    background:var(--cobra-navy); color:#fff; border:none;
+    padding:10px 16px; border-radius:24px; font-size:13.5px; font-weight:700;
+    font-family:inherit; cursor:pointer;
+    box-shadow:0 6px 16px rgba(0,60,113,.28);
+    transition:background .15s ease, transform .15s ease;
+  }
+  .export-pdf-btn:hover{ background:var(--cobra-blue); transform:translateY(-1px); }
+  .export-pdf-btn svg{ width:15px; height:15px; flex:none; }
+  @media (max-width:640px){ .export-pdf-btn span{ display:none; } .export-pdf-btn{ padding:10px; } }
+
+  @media print{
+    .no-print{ display:none !important; }
+    body{ background:#fff; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    header.hero{ background:#fff; border-bottom:2px solid var(--celeste); }
+    header.hero::after{ display:none; }
+    .kpi-grid{ margin-top:14px; }
+    .panel, .kpi-card, .tech-card, .rec-item{ box-shadow:none; border:1px solid var(--border); }
+    section{ break-inside:avoid-page; }
+    .kpi-card, .tech-card, .rec-item{ break-inside:avoid; }
+    .grid-2, .perf-grid{ break-inside:avoid; }
+  }
+</style>
+</head>
+<body>
+
+<button class="export-pdf-btn no-print" onclick="window.print()" type="button">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h9l3 3v4"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+  <span>Exportar a PDF</span>
+</button>
+
+<header class="hero">
+  <a class="back-link no-print" href="index.html">&larr; Volver al indice de informes</a>
+  <div class="brand-row">
+    <img src="logo-cobra.png" alt="Cobra">
+    <div class="brand-divider"></div>
+    <div class="eyebrow">Calidad &amp; Capacitacion · Analisis de Averias de Infancia</div>
+  </div>
+  <h1>Informe de Averias de Infancia — COBRA</h1>
+  <div class="subtitle">Instalaciones de Fibra Optica que generaron una reparacion dentro de su periodo de infancia (los dias siguientes a la instalacion), a partir de los registros de COBRA. Incluye tasa de infancia por agencia, producto y tecnico instalador, distribucion de causas y claves de cierre de la reparacion, tiempos hasta la falla, y si la resolvio el mismo tecnico que instalo.</div>
+  <div class="meta-row" id="metaRow"></div>
+</header>
+
+<main>
+  <div class="kpi-grid" id="kpiGrid"></div>
+
+  <section>
+    <div class="section-title"><span class="num">01</span><h2>Tasa de Infancia por Agencia</h2></div>
+    <p class="section-desc">Porcentaje de instalaciones que generaron una reparacion dentro de su periodo de infancia, comparado contra la meta institucional.</p>
+    <div class="grid-2">
+      <div class="panel" style="height:300px;"><canvas id="chartAgencia"></canvas></div>
+      <div class="panel">
+        <div style="font-size:13px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">Detalle por agencia</div>
+        <table id="tablaAgencia"></table>
+        <div class="callout" style="margin-top:16px;" id="agenciaCallout"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title"><span class="num">02</span><h2>Tasa de Infancia por Producto</h2></div>
+    <p class="section-desc">Que producto instalado reincide con mas frecuencia dentro del periodo de infancia.</p>
+    <div class="grid-2">
+      <div class="panel" style="height:280px;"><canvas id="chartProducto"></canvas></div>
+      <div class="panel">
+        <div style="font-size:13px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">Detalle por producto</div>
+        <table id="tablaProducto"></table>
+        <div class="callout" style="margin-top:16px;" id="productoCallout"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title"><span class="num">03</span><h2>Causas y Claves de Cierre de la Reparacion de Infancia</h2></div>
+    <p class="section-desc">Distribucion dentro del grupo de averias de infancia (no es una tasa contra el total de instalaciones).</p>
+    <div class="grid-2">
+      <div class="panel" style="height:320px;"><canvas id="chartCausa"></canvas></div>
+      <div class="panel">
+        <div style="font-size:13px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">Clave de cierre</div>
+        <table id="tablaClave"></table>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title"><span class="num">04</span><h2>Tiempo hasta la Infancia</h2></div>
+    <p class="section-desc">Cuantos dias pasan entre la instalacion y la reparacion de infancia. Mientras mas cerca de 0 dias, mas probable que la instalacion original tuviera un defecto de origen.</p>
+    <div class="grid-2">
+      <div class="panel" style="height:300px;"><canvas id="chartDias"></canvas></div>
+      <div class="panel">
+        <div style="font-size:13px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">Resumen</div>
+        <table id="tablaDias"></table>
+        <div class="callout" style="margin-top:16px;" id="diasCallout"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title"><span class="num">05</span><h2>Reparacion Atendida por el Mismo Tecnico que Instalo</h2></div>
+    <p class="section-desc">De las averias de infancia, si volvio el mismo tecnico que instalo o si tuvo que intervenir otro.</p>
+    <div class="grid-2">
+      <div class="panel" style="height:300px;"><canvas id="chartMismo"></canvas></div>
+      <div class="panel">
+        <div style="font-size:13px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">Por causa</div>
+        <table id="tablaMismo"></table>
+        <div class="callout" style="margin-top:16px;" id="mismoCallout"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title"><span class="num">06</span><h2>Ranking de Tecnicos Instaladores por Tasa de Infancia (min. 10 instalaciones)</h2></div>
+    <p class="section-desc">Ordenado de menor a mayor tasa dentro de cada agencia. Base para reconocimiento y para focalizar coaching/capacitacion.</p>
+    <div id="tecnicosPorAgencia"></div>
+  </section>
+
+  <section>
+    <div class="section-title"><span class="num">07</span><h2>Mejor y Menor Desempeno</h2></div>
+    <p class="section-desc">Tecnicos instaladores con minimo 10 instalaciones, ordenados por su tasa de infancia.</p>
+    <div class="perf-grid">
+      <div>
+        <div class="perf-col-title top">🟢 Mejor desempeno</div>
+        <div id="topTecnicos"></div>
+      </div>
+      <div>
+        <div class="perf-col-title bottom">🔴 Menor desempeno</div>
+        <div id="bottomTecnicos"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title"><span class="num">08</span><h2>Conclusiones y Recomendaciones</h2></div>
+    <div class="rec-list" id="recList"></div>
+  </section>
+</main>
+
+<footer id="footerText"></footer>
+
+<script>
+const DATA = {"archivoOrigen":"p22-Averias-infancia_1_COBRA_2026-08.csv","generadoEl":"14-08-2026, 11:50:28 p. m.","periodo":"2026-07-01 al 2026-07-31","agencias_lista":"PUNTA ARENAS y COYHAIQUE y INDEPENDENCIA","meta":2.5,"totalInstalaciones":1267,"totalInfancia":37,"tasaGlobal":2.9,"diasPromedio":10.3,"diasMediana":10,"pctDentro7":45.9,"mismoPct":51.4,"mismoTotal":37,"agencias":[{"agencia":"INDEPENDENCIA","total":1,"infancia":1,"tasa":100},{"agencia":"PUNTA ARENAS","total":1077,"infancia":46,"tasa":4.3},{"agencia":"COYHAIQUE","total":189,"infancia":7,"tasa":3.7}],"productos":[{"producto":"BAF","total":843,"infancia":37,"tasa":4.4},{"producto":"TVD","total":414,"infancia":17,"tasa":4.1},{"producto":"STB","total":10,"infancia":0,"tasa":0}],"causas":[{"causa":"BA-CABLE INT/ ROSETA OPTICA - FO -90057","count":11,"pct":29.7},{"causa":"BA-MODEM DANADO - FO - 90057","count":9,"pct":24.3},{"causa":"BA-NO NAVEGA - FO - 97918","count":9,"pct":24.3},{"causa":"DESPACHO TEC REQUERIDO BOT WHATSAPP - FO - 97918","count":3,"pct":8.1},{"causa":"BA-CABLE INT/ ROSETA OPTICA - FO -97918","count":2,"pct":5.4},{"causa":"DESPACHO TEC REQUERIDO MI MOVISTAR - FO - 97918","count":2,"pct":5.4},{"causa":"SET TOP BOX CON DEFECTO - FO - 90057","count":1,"pct":2.7}],"claves":[{"clave":"F56","count":12,"pct":32.4},{"clave":"801","count":5,"pct":13.5},{"clave":"952","count":5,"pct":13.5},{"clave":"F67","count":5,"pct":13.5},{"clave":"F52","count":4,"pct":10.8},{"clave":"F02","count":2,"pct":5.4},{"clave":"I57","count":2,"pct":5.4},{"clave":"H01","count":1,"pct":2.7},{"clave":"W05","count":1,"pct":2.7}],"diasBuckets":[{"label":"0-1 dias","count":3,"pct":8.1},{"label":"2-3 dias","count":5,"pct":13.5},{"label":"4-7 dias","count":9,"pct":24.3},{"label":"8-15 dias","count":9,"pct":24.3},{"label":"16-30 dias","count":11,"pct":29.7}],"mismoPorCausa":[{"causa":"BA-CABLE INT/ ROSETA OPTICA - FO -97918","total":2,"mismo":1,"tasa":50},{"causa":"DESPACHO TEC REQUERIDO BOT WHATSAPP - FO - 97918","total":3,"mismo":2,"tasa":66.7},{"causa":"BA-MODEM DANADO - FO - 90057","total":9,"mismo":6,"tasa":66.7},{"causa":"BA-NO NAVEGA - FO - 97918","total":9,"mismo":2,"tasa":22.2},{"causa":"SET TOP BOX CON DEFECTO - FO - 90057","total":1,"mismo":0,"tasa":0},{"causa":"BA-CABLE INT/ ROSETA OPTICA - FO -90057","total":11,"mismo":8,"tasa":72.7},{"causa":"DESPACHO TEC REQUERIDO MI MOVISTAR - FO - 97918","total":2,"mismo":0,"tasa":0}],"tecnicos":[{"tecnico":"DAVID ERIC SANTIBANEZ PRADO","agencia":"INDEPENDENCIA","total":1,"infancia":1,"tasa":100},{"tecnico":"LUIS ALFONSO BARRIENTOS MUNOZ","agencia":"PUNTA ARENAS","total":55,"infancia":8,"tasa":14.5},{"tecnico":"GONZALO RODRIGO CARCAMO MALDONADO","agencia":"PUNTA ARENAS","total":45,"infancia":4,"tasa":8.9},{"tecnico":"LUCAS RENATO SERON VELASQUEZ","agencia":"PUNTA ARENAS","total":74,"infancia":6,"tasa":8.1},{"tecnico":"MARCOS ALEJANDRO AGUILAR ROA","agencia":"PUNTA ARENAS","total":64,"infancia":5,"tasa":7.8},{"tecnico":"CARLOS ALFONSO PINTO AGUILAR","agencia":"PUNTA ARENAS","total":41,"infancia":3,"tasa":7.3},{"tecnico":"EDUARDO ANDRES WITTO MANSILLA","agencia":"PUNTA ARENAS","total":32,"infancia":2,"tasa":6.3},{"tecnico":"VICTOR HUGO BARRIA ALMONACID","agencia":"PUNTA ARENAS","total":49,"infancia":3,"tasa":6.1},{"tecnico":"JUAN CARLOS ULLOA MORAGA","agencia":"PUNTA ARENAS","total":34,"infancia":2,"tasa":5.9},{"tecnico":"GABRIEL LEONIDAS RAMIREZ IBARRA","agencia":"PUNTA ARENAS","total":70,"infancia":4,"tasa":5.7},{"tecnico":"JOAN JOEL HERNANDEZ AMAYA","agencia":"PUNTA ARENAS","total":53,"infancia":3,"tasa":5.7},{"tecnico":"AXEL LEONARDO ALFARO ALVAREZ","agencia":"COYHAIQUE","total":103,"infancia":4,"tasa":3.9},{"tecnico":"JULIO LOPEZ CORTES","agencia":"COYHAIQUE","total":86,"infancia":3,"tasa":3.5},{"tecnico":"ROBERTO ESTEBAN DIAZ GARRIDO","agencia":"PUNTA ARENAS","total":71,"infancia":2,"tasa":2.8},{"tecnico":"FELIPE ANTONIO RIOS CIFUENTES","agencia":"PUNTA ARENAS","total":40,"infancia":1,"tasa":2.5},{"tecnico":"MARCELO FERNANDO CARDENAS LLANCALAHUEN","agencia":"PUNTA ARENAS","total":49,"infancia":1,"tasa":2},{"tecnico":"JOSE ALEXIS BARRIA ALMONACID","agencia":"PUNTA ARENAS","total":53,"infancia":1,"tasa":1.9},{"tecnico":"LUIS ALFONSO TORRES MILLAQUEN","agencia":"PUNTA ARENAS","total":58,"infancia":1,"tasa":1.7},{"tecnico":"CARLOS ROBERTO SALDIVIA HERNANDEZ","agencia":"PUNTA ARENAS","total":31,"infancia":0,"tasa":0},{"tecnico":"RONIEL JESUS DIAZ SUAREZ","agencia":"PUNTA ARENAS","total":65,"infancia":0,"tasa":0},{"tecnico":"RODRIGO EDUARDO GODOY CARCAMO","agencia":"PUNTA ARENAS","total":50,"infancia":0,"tasa":0},{"tecnico":"EGON RODRIGO VILLARROEL ZUNIGA","agencia":"PUNTA ARENAS","total":47,"infancia":0,"tasa":0},{"tecnico":"MIGUEL ALEJANDRO ALVARADO VIVAR","agencia":"PUNTA ARENAS","total":65,"infancia":0,"tasa":0},{"tecnico":"RENE EDUARDO MAYORGA LEUQUEN","agencia":"PUNTA ARENAS","total":28,"infancia":0,"tasa":0},{"tecnico":"MIGUEL ANTONIO ARIAS ACOSTA","agencia":"PUNTA ARENAS","total":3,"infancia":0,"tasa":0}],"highlights":{"top":[{"tecnico":"CARLOS ROBERTO SALDIVIA HERNANDEZ","tasa":0,"total":31,"infancia":0,"nota":"Sin averias de infancia en 31 instalaciones"},{"tecnico":"RONIEL JESUS DIAZ SUAREZ","tasa":0,"total":65,"infancia":0,"nota":"Sin averias de infancia en 65 instalaciones"},{"tecnico":"RODRIGO EDUARDO GODOY CARCAMO","tasa":0,"total":50,"infancia":0,"nota":"Sin averias de infancia en 50 instalaciones"},{"tecnico":"EGON RODRIGO VILLARROEL ZUNIGA","tasa":0,"total":47,"infancia":0,"nota":"Sin averias de infancia en 47 instalaciones"}],"bottom":[{"tecnico":"LUIS ALFONSO BARRIENTOS MUNOZ","tasa":14.5,"total":55,"infancia":8,"nota":"Su causa mas frecuente: BA-CABLE INT/ ROSETA OPTICA - FO -90057 (2 casos)"},{"tecnico":"GONZALO RODRIGO CARCAMO MALDONADO","tasa":8.9,"total":45,"infancia":4,"nota":"Su causa mas frecuente: BA-CABLE INT/ ROSETA OPTICA - FO -90057 (1 caso)"},{"tecnico":"LUCAS RENATO SERON VELASQUEZ","tasa":8.1,"total":74,"infancia":6,"nota":"Su causa mas frecuente: BA-MODEM DANADO - FO - 90057 (2 casos)"},{"tecnico":"MARCOS ALEJANDRO AGUILAR ROA","tasa":7.8,"total":64,"infancia":5,"nota":"Su causa mas frecuente: BA-MODEM DANADO - FO - 90057 (2 casos)"}]},"conclusiones":["Tasa global de averias de infancia: <strong>2.9%</strong> — <span style=\"color:#e2523e;font-weight:700;\">NO CUMPLE</span> la meta del 2.5% (37 de 1267 instalaciones tuvieron reparacion dentro de su infancia).","La agencia con mayor tasa es <strong>INDEPENDENCIA</strong> con 100.0% (1/1).","El producto con mayor tasa es <strong>BAF</strong> con 4.4%.","La causa mas frecuente de la reparacion de infancia es <strong>BA-CABLE INT/ ROSETA OPTICA - FO -90057</strong> (11 de 37 casos, 30%).","El tecnico instalador con mayor tasa de infancia (minimo 10 instalaciones) es <strong>LUIS ALFONSO BARRIENTOS MUNOZ</strong> con 14.5% (8/55).","El mejor desempeno (minimo 10 instalaciones) es de <strong>CARLOS ROBERTO SALDIVIA HERNANDEZ</strong> con 0.0%.","En promedio, la reparacion de infancia ocurre a los <strong>10.3 dias</strong> de la instalacion; el 46% ocurre dentro de la primera semana.","El <strong>51%</strong> de las averias de infancia fueron atendidas por el mismo tecnico que hizo la instalacion original."]};
+
+function npsClass(v, meta){ return v<=meta ? 'hi' : (v<=meta*2 ? 'mid' : 'lo'); }
+function titleCase(s){ return s.split(' ').map(w=>w?w[0]+w.slice(1).toLowerCase():w).join(' '); }
+
+document.getElementById('metaRow').innerHTML = `
+  <span>📅 Periodo analizado: <b>${DATA.periodo}</b></span>
+  <span>📍 Agencias: <b>${DATA.agencias_lista}</b></span>
+  <span>🧾 Base: <b>${DATA.totalInstalaciones} instalaciones</b> · ${DATA.totalInfancia} averias de infancia</span>
+  <span>🧮 Formula: <b>Averias de Infancia / Total de instalaciones</b></span>
+`;
+
+const fontColor = '#6b7a8c';
+Chart.defaults.color = fontColor;
+Chart.defaults.borderColor = 'rgba(20,50,80,0.06)';
+Chart.defaults.font.family = "'Segoe UI', Arial, sans-serif";
+
+const metaGap = +(DATA.tasaGlobal - DATA.meta).toFixed(1);
+const metaSub = metaGap <= 0
+  ? `<span style="color:var(--promotor)">▼ ${Math.abs(metaGap)} pts bajo la meta (${DATA.meta}%) — cumple</span>`
+  : `<span style="color:var(--detractor)">▲ ${metaGap} pts sobre la meta (${DATA.meta}%) — no cumple</span>`;
+document.getElementById('kpiGrid').innerHTML = `
+  <div class="kpi-card"><div class="label">Tasa Global de Infancia</div><div class="value hl">${DATA.tasaGlobal}%</div><div class="sub">${metaSub}</div></div>
+  <div class="kpi-card"><div class="label">Total Instalaciones</div><div class="value">${DATA.totalInstalaciones}</div><div class="sub">Periodo ${DATA.periodo}</div></div>
+  <div class="kpi-card"><div class="label">Averias de Infancia</div><div class="value">${DATA.totalInfancia}</div><div class="sub">Instalaciones que fallaron temprano</div></div>
+  <div class="kpi-card"><div class="label">Dias Prom. hasta la Infancia</div><div class="value">${DATA.diasPromedio ?? '-'}</div><div class="sub">Mediana: ${DATA.diasMediana ?? '-'} dias · ${DATA.pctDentro7}% dentro de 7 dias</div></div>
+  <div class="kpi-card"><div class="label">% Mismo Tecnico</div><div class="value">${DATA.mismoPct ?? '-'}%</div><div class="sub">${DATA.mismoTotal} casos</div></div>
+`;
+
+new Chart(document.getElementById('chartAgencia'), {
+  type: 'bar',
+  data: {
+    labels: DATA.agencias.map(a=>a.agencia),
+    datasets: [
+      { label:'Tasa de infancia (%)', data: DATA.agencias.map(a=>a.tasa), backgroundColor: DATA.agencias.map(a=> a.tasa<=DATA.meta ? 'rgba(31,169,113,0.85)' : 'rgba(226,82,62,0.85)'), borderRadius:6, maxBarThickness:60 },
+      { label:'Meta ('+DATA.meta+'%)', data: DATA.agencias.map(()=>DATA.meta), type:'line', borderColor:'#e2523e', borderDash:[5,4], borderWidth:1.5, pointRadius:0, tension:0 }
+    ]
+  },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'top', labels:{boxWidth:10} } }, scales:{ y:{ min:0, title:{display:true,text:'Tasa %'}, grid:{color:'rgba(20,50,80,0.06)'} } } }
+});
+let rowsAg = '<tr><th>Agencia</th><th>Tasa</th><th>vs. Meta</th><th>Instalaciones</th></tr>';
+DATA.agencias.slice().sort((a,b)=>a.tasa-b.tasa).forEach(a=>{
+  const gap = +(a.tasa - DATA.meta).toFixed(1);
+  const gapTxt = gap<=0 ? `<span style="color:var(--promotor)">${gap}</span>` : `<span style="color:var(--detractor)">+${gap}</span>`;
+  rowsAg += `<tr><td>${a.agencia}</td><td><span class="badge ${npsClass(a.tasa,DATA.meta)}">${a.tasa}%</span></td><td>${gapTxt}</td><td>${a.total}</td></tr>`;
+});
+document.getElementById('tablaAgencia').innerHTML = rowsAg;
+const agSobreMeta = DATA.agencias.filter(a=>a.tasa > DATA.meta);
+document.getElementById('agenciaCallout').innerHTML = agSobreMeta.length
+  ? `<b>Sobre la meta:</b> ${agSobreMeta.map(a=>`${a.agencia} (${a.tasa}%)`).join(' y ')} supera el ${DATA.meta}% institucional.`
+  : `<b>Todas las agencias dentro de la meta</b> de ${DATA.meta}% este periodo.`;
+
+new Chart(document.getElementById('chartProducto'), {
+  type: 'bar',
+  data: {
+    labels: DATA.productos.map(p=>p.producto),
+    datasets: [
+      { label:'Tasa de infancia (%)', data: DATA.productos.map(p=>p.tasa), backgroundColor: DATA.productos.map(p=> p.tasa<=DATA.meta ? 'rgba(31,169,113,0.85)' : 'rgba(226,82,62,0.85)'), borderRadius:6, maxBarThickness:50 },
+      { label:'Meta ('+DATA.meta+'%)', data: DATA.productos.map(()=>DATA.meta), type:'line', borderColor:'#e2523e', borderDash:[5,4], borderWidth:1.5, pointRadius:0, tension:0 }
+    ]
+  },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'top', labels:{boxWidth:10} } }, scales:{ y:{ min:0, title:{display:true,text:'Tasa %'}, grid:{color:'rgba(20,50,80,0.06)'} } } }
+});
+let rowsPr = '<tr><th>Producto</th><th>Tasa</th><th>Infancia</th><th>Total</th></tr>';
+DATA.productos.slice().sort((a,b)=>b.tasa-a.tasa).forEach(p=>{
+  rowsPr += `<tr><td>${p.producto}</td><td><span class="badge ${npsClass(p.tasa,DATA.meta)}">${p.tasa}%</span></td><td>${p.infancia}</td><td>${p.total}</td></tr>`;
+});
+document.getElementById('tablaProducto').innerHTML = rowsPr;
+const peorPr = DATA.productos.slice().sort((a,b)=>b.tasa-a.tasa)[0];
+document.getElementById('productoCallout').innerHTML = peorPr ? `<b>Foco principal:</b> ${peorPr.producto} tiene la mayor tasa de infancia (${peorPr.tasa}%).` : '';
+
+new Chart(document.getElementById('chartCausa'), {
+  type: 'bar',
+  data: {
+    labels: DATA.causas.map(c=>c.causa),
+    datasets: [{ label:'% de averias de infancia', data: DATA.causas.map(c=>c.pct), backgroundColor:'rgba(0,113,206,0.85)', borderRadius:5, maxBarThickness:26 }]
+  },
+  options: { indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ x:{ min:0, title:{display:true,text:'% de casos'}, grid:{color:'rgba(20,50,80,0.06)'} } } }
+});
+let rowsCl = '<tr><th>Clave</th><th>Casos</th><th>%</th></tr>';
+DATA.claves.forEach(c=>{ rowsCl += `<tr><td>${c.clave}</td><td>${c.count}</td><td>${c.pct}%</td></tr>`; });
+document.getElementById('tablaClave').innerHTML = rowsCl;
+
+new Chart(document.getElementById('chartDias'), {
+  type: 'bar',
+  data: { labels: DATA.diasBuckets.map(b=>b.label), datasets: [{ label:'Casos', data: DATA.diasBuckets.map(b=>b.count), backgroundColor:'rgba(0,113,206,0.85)', borderRadius:6, maxBarThickness:60 }] },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ min:0, title:{display:true,text:'N° de casos'}, grid:{color:'rgba(20,50,80,0.06)'} } } }
+});
+document.getElementById('tablaDias').innerHTML = `
+  <tr><th>Indicador</th><th>Valor</th></tr>
+  <tr><td>Promedio</td><td>${DATA.diasPromedio ?? '-'} dias</td></tr>
+  <tr><td>Mediana</td><td>${DATA.diasMediana ?? '-'} dias</td></tr>
+  <tr><td>Dentro de 7 dias</td><td><span class="badge ${DATA.pctDentro7>=60?'lo':'mid'}">${DATA.pctDentro7}%</span></td></tr>
+`;
+document.getElementById('diasCallout').innerHTML =
+  `<b>${DATA.pctDentro7}%</b> de las averias de infancia ocurre dentro de la primera semana. Cuanto mas alto este numero, mas senal de un defecto de origen en la instalacion (no de una falla nueva independiente).`;
+
+new Chart(document.getElementById('chartMismo'), {
+  type: 'doughnut',
+  data: { labels: ['Mismo tecnico', 'Tecnico distinto'], datasets: [{ data: [DATA.mismoPct, +(100-DATA.mismoPct).toFixed(1)], backgroundColor: ['#e2523e','#1fa971'], borderWidth:0 }] },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{boxWidth:10} } }, cutout: '62%' }
+});
+let rowsMi = '<tr><th>Causa</th><th>% Mismo Tecnico</th><th>Casos</th></tr>';
+DATA.mismoPorCausa.forEach(m=>{ rowsMi += `<tr><td>${m.causa}</td><td><span class="badge ${m.tasa>=50?'lo':'hi'}">${m.tasa}%</span></td><td>${m.mismo}/${m.total}</td></tr>`; });
+document.getElementById('tablaMismo').innerHTML = rowsMi;
+document.getElementById('mismoCallout').innerHTML =
+  `<b>${DATA.mismoPct}%</b> de las averias de infancia fueron atendidas por el mismo tecnico que hizo la instalacion original.`;
+
+const agenciasOrden = DATA.agencias.slice().sort((a,b)=>b.total-a.total).map(a=>a.agencia);
+let tecnicosHtml = '';
+agenciasOrden.forEach(agencia => {
+  const tecsAg = DATA.tecnicos.filter(t=>t.agencia===agencia && t.total>=10).sort((a,b)=>a.tasa-b.tasa);
+  if (!tecsAg.length) return;
+  let rowsTec = '<tr><th>#</th><th>Tecnico</th><th>Tasa</th><th>Instalaciones</th><th>Infancia</th></tr>';
+  tecsAg.forEach((t,i)=>{
+    rowsTec += `<tr><td>${i+1}</td><td>${titleCase(t.tecnico)}</td><td><span class="badge ${npsClass(t.tasa,DATA.meta)}">${t.tasa}%</span></td><td>${t.total}</td><td>${t.infancia}</td></tr>`;
+  });
+  tecnicosHtml += `<div class="panel" style="margin-bottom:16px;">
+    <div style="font-size:13px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">${agencia} · ${tecsAg.length} tecnico${tecsAg.length===1?'':'s'} (min. 10 instalaciones)</div>
+    <table>${rowsTec}</table>
+  </div>`;
+});
+document.getElementById('tecnicosPorAgencia').innerHTML = tecnicosHtml;
+
+function techCard(t, kind){
+  const cls = kind==='top' ? 'hi' : 'lo';
+  return `<div class="tech-card ${kind==='top'?'top-card':'bottom-card'}">
+    <div class="tech-head"><span class="tech-name">${titleCase(t.tecnico)}</span><span class="tech-nps ${cls}">${t.tasa}%</span></div>
+    <div class="tech-meta">${t.total} instalaciones · ${t.infancia} averia${t.infancia===1?'':'s'} de infancia</div>
+    <div class="tech-quote">${t.nota}</div>
+  </div>`;
+}
+document.getElementById('topTecnicos').innerHTML = DATA.highlights.top.map(t=>techCard(t,'top')).join('');
+document.getElementById('bottomTecnicos').innerHTML = DATA.highlights.bottom.map(t=>techCard(t,'bottom')).join('');
+
+document.getElementById('recList').innerHTML = DATA.conclusiones.map((c,i)=>`
+  <div class="rec-item"><div class="idx">${i+1}</div><p>${c}</p></div>
+`).join('');
+
+document.getElementById('footerText').innerHTML =
+  `Informe generado a partir de ${DATA.archivoOrigen} · ${DATA.agencias_lista} · Generado ${DATA.generadoEl}`;
+</script>
+
+</body>
+</html>

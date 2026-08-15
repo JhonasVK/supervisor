@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Informe de Repetido Reparado · COBRA</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#eef1f4;
+    --panel:#ffffff;
+    --panel-2:#f5f7f9;
+    --border:#e0e5ea;
+    --text:#22303f;
+    --text-dim:#6b7a8c;
+    --cobra-navy:#003c71;
+    --cobra-blue:#0071ce;
+    --celeste:#29a9e0;
+    --celeste-soft:#e8f6fd;
+    --promotor:#1fa971;
+    --neutro:#e2962e;
+    --detractor:#e2523e;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI', Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+  }
+  header.hero{
+    background:linear-gradient(120deg,#ffffff 0%,var(--celeste-soft) 55%,#dcf1fb 100%);
+    padding:34px 6vw 40px;
+    position:relative;
+    overflow:hidden;
+    border-bottom:4px solid var(--celeste);
+  }
+  header.hero::after{
+    content:"";
+    position:absolute; right:-100px; top:-100px;
+    width:340px; height:340px; border-radius:50%;
+    background:radial-gradient(circle, rgba(41,169,224,0.18), transparent 70%);
+  }
+  .brand-row{ display:flex; align-items:center; gap:18px; margin-bottom:22px; }
+  .brand-row img{ height:46px; }
+  .brand-divider{ width:1px; height:34px; background:var(--border); }
+  .eyebrow{ text-transform:uppercase; letter-spacing:.14em; font-size:12.5px; color:var(--celeste); font-weight:800; }
+  h1{ margin:0 0 6px; font-size:clamp(26px,4vw,38px); font-weight:800; letter-spacing:-0.01em; color:var(--cobra-navy); }
+  .subtitle{ color:#3a4a5c; font-size:15px; max-width:660px; line-height:1.55; }
+  .meta-row{ display:flex; gap:22px; flex-wrap:wrap; margin-top:22px; font-size:13px; color:#3a4a5c; }
+  .meta-row span b{color:var(--cobra-navy);}
+  .back-link{ display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:var(--cobra-navy); text-decoration:none; margin-bottom:14px; }
+  .back-link:hover{ text-decoration:underline; }
+  main{ padding:36px 6vw 80px; max-width:1280px; margin:0 auto; }
+
+  .kpi-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:16px; margin:-58px 0 34px; position:relative; z-index:2; }
+  .kpi-card{ background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:20px 20px 18px; box-shadow:0 10px 24px rgba(20,50,80,.08); }
+  .kpi-card .label{ font-size:11.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-dim); font-weight:700; margin-bottom:8px; }
+  .kpi-card .value{ font-size:30px; font-weight:800; line-height:1; color:var(--cobra-navy); }
+  .kpi-card .value.hl{ color:var(--celeste); }
+  .kpi-card .sub{ font-size:12px; color:var(--text-dim); margin-top:6px; }
+
+  section{ margin-bottom:44px; }
+  .section-title{ display:flex; align-items:baseline; gap:10px; margin-bottom:6px; }
+  .section-title .num{ font-size:13px; font-weight:800; color:var(--celeste); background:rgba(41,169,224,0.12); border:1px solid rgba(41,169,224,.35); border-radius:6px; padding:2px 8px; }
+  .section-title h2{ margin:0; font-size:20px; font-weight:750; color:var(--cobra-navy); }
+  .section-desc{ color:var(--text-dim); font-size:13.5px; margin:0 0 18px; max-width:820px; line-height:1.55;}
+
+  .panel{ background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:22px 24px 14px; box-shadow:0 4px 14px rgba(20,50,80,.05); }
+  .grid-2{ display:grid; grid-template-columns:1.35fr .95fr; gap:18px; }
+  @media (max-width:880px){ .grid-2{grid-template-columns:1fr;} }
+
+  table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  th{ text-align:left; color:var(--text-dim); font-weight:700; font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; padding:10px 10px; border-bottom:1px solid var(--border); }
+  td{ padding:10px; border-bottom:1px solid var(--panel-2); }
+  tr:hover td{ background:var(--panel-2); }
+  .badge{ display:inline-block; padding:2px 9px; border-radius:20px; font-size:11.5px; font-weight:700; }
+  .badge.hi{ background:rgba(31,169,113,.12); color:var(--promotor); }
+  .badge.mid{ background:rgba(226,150,46,.14); color:var(--neutro); }
+  .badge.lo{ background:rgba(226,82,62,.12); color:var(--detractor); }
+
+  .callout{ border-left:3px solid var(--celeste); background:linear-gradient(90deg, var(--celeste-soft), transparent); padding:14px 18px; border-radius:0 10px 10px 0; font-size:13.5px; color:#2c3e50; line-height:1.6; }
+  .callout.warn{ border-left-color:var(--neutro); background:linear-gradient(90deg, rgba(226,150,46,.10), transparent); }
+
+  .rec-list{ display:grid; gap:10px; margin-top:8px; }
+  .rec-item{ display:flex; gap:12px; align-items:flex-start; background:var(--panel-2); border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
+  .rec-item .idx{ flex:none; width:26px; height:26px; border-radius:50%; background:var(--celeste); color:#fff; font-weight:800; font-size:12.5px; display:flex; align-items:center; justify-content:center; }
+  .rec-item p{ margin:0; font-size:13.5px; color:#334252; line-height:1.55; }
+  .rec-item strong{ color:var(--cobra-navy); }
+
+  .perf-grid{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:880px){ .perf-grid{grid-template-columns:1fr;} }
+  .perf-col-title{ font-size:13px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+  .perf-col-title.top{ color:var(--promotor); }
+  .perf-col-title.bottom{ color:var(--detractor); }
+  .tech-card{ background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:16px 18px; margin-bottom:12px; box-shadow:0 3px 10px rgba(20,50,80,.04); }
+  .tech-card.bottom-card{ border-left:4px solid var(--detractor); }
+  .tech-card.top-card{ border-left:4px solid var(--promotor); }
+  .tech-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .tech-name{ font-weight:750; font-size:14px; color:var(--cobra-navy); }
+  .tech-nps{ font-weight:800; font-size:15px; }
+  .tech-nps.lo{ color:var(--detractor); }
+  .tech-nps.hi{ color:var(--promotor); }
+  .tech-meta{ font-size:12px; color:var(--text-dim); margin-bottom:8px; }
+  .tech-quote{ font-size:12.5px; color:#4a5a6b; font-style:italic; margin-top:8px; background:var(--panel-2); border-radius:8px; padding:8px 10px; border-left:2px solid var(--border); }
+
+  footer{ text-align:center; padding:26px; color:var(--text-dim); font-size:12px; border-top:1px solid var(--border); }
+  canvas{ max-width:100%; }
+
+  .export-pdf-btn{
+    position:fixed; top:18px; right:18px; z-index:50;
+    display:flex; align-items:center; gap:8px;
+    background:var(--cobra-navy); color:#fff; border:none;
+    padding:10px 16px; border-radius:24px; font-size:13.5px; font-weight:700;
+    font-family:inherit; cursor:pointer;
+    box-shadow:0 6px 16px rgba(0,60,113,.28);
+    transition:background .15s ease, transform .15s ease;
+  }
+  .export-pdf-btn:hover{ background:var(--cobra-blue); transform:translateY(-1px); }
+  .export-pdf-btn svg{ width:15px; height:15px; flex:none; }
+  @media (max-width:640px){ .export-pdf-btn span{ display:none; } .export-pdf-btn{ padding:10px; } }
+
+  @media print{
+    .no-print{ display:none !important; }
+    body{ background:#fff; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    header.hero{ background:#fff; border-bottom:2px solid var(--celeste); }
+    header.hero::after{ display:none; }
+    .kpi-grid{ margin-top:14px; }
+    .panel, .kpi-card, .tech-card, .rec-item{ box-shadow:none; border:1px solid var(--border); }
+    section{ break-inside:avoid-page; }
+    .kpi-card, .tech-card, .rec-item{ break-inside:avoid; }
+    .grid-2, .perf-grid{ break-inside:avoid; }
+  }
+</style>
+</head>
+<body>
+
+<button class="export-pdf-btn no-print" onclick="window.print()" type="button">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h9l3 3v4"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+  <span>Exportar a PDF</span>
+</button>
+
+<header class="hero">
+  <a class="back-link no-print" href="index.html">&larr; Volver al indice de informes</a>
+  <div class="brand-row">
+    <img src="logo-cobra.png" alt="Cobra">
+    <div class="brand-divider"></div>
+    <div class="eyebrow">Calidad &amp; Capacitacion · Analisis de Averias Reiteradas</div>
+  </div>
+  <h1>Informe de Repetido Reparado — COBRA</h1>
+  <div class="subtitle" id="heroSubtitle">Analisis de reparaciones de Fibra Optica que volvieron a fallar dentro de 30 dias, a partir de las reparaciones registradas por COBRA. Incluye tasa de reincidencia por agencia, causa y tecnico, tiempos hasta la reiteracion, y si el reitero lo resolvio el mismo tecnico u otro.</div>
+  <div class="meta-row" id="metaRow"></div>
+</header>
+
+<main>
+  <div class="kpi-grid" id="kpiGrid"></div>
+
+  <section>
+    <div class="section-title"><span class="num">01</span><h2>Tasa de Reincidencia por Agencia</h2></div>
+    <p class="section-desc">Porcentaje de reparaciones que volvieron a fallar dentro de 30 dias, comparado contra la meta institucional.</p>
+    <div class="grid-2">
+      <div class="panel" style="height:300px;"><canvas id="chartAgencia"></canvas></div>
+      <div class="panel">
+        <div style="font-size:13px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">Detalle por agencia</div>
+        <table id="tablaAgencia"></table>
+        <div class="callout" style="margin-top:16px;" id="agenciaCallout"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title"><span class="num">02</span><h2>Tasa de Reincidencia por Causa</h2></div>
+    <p class="section-desc">Que tipo de falla reincide con mas frecuencia dentro de los 30 dias posteriores a la reparacion.</p>
+    <div class="grid-2">
+      <div class="panel" style="height:340px;"><canvas id="chartCausa"></canvas></div>
+      <div class="panel">
+        <div style="font-size:13px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">Detalle por causa</div>
+        <table id="tablaCausa"></table>
+        <div class="callout" style="margin-top:16px;" id="causaCallout"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title"><span class="num">03</span><h2>Tasa de Reincidencia por Subcausa</h2></div>
+    <p class="section-desc">Detalle mas fino de la causa. Solo se incluyen subcausas con 5 o mas reparaciones totales, para que la tasa sea representativa.</p>
+    <div class="panel" style="height:380px;"><canvas id="chartSubcausa"></canvas></div>
+  </section>
+
+  <section>
+    <div class="section-title"><span class="num">04</span><h2>Tiempo hasta la Reiteracion</h2></div>
+    <p class="section-desc">Cuantos dias pasan entre la reparacion original y la reincidencia. Mientras mas cerca de 0 dias, mas probable que la reparacion original no haya resuelto el problema de fondo.</p>
+    <div class="grid-2">
+      <div class="panel" style="height:300px;"><canvas id="chartDias"></canvas></div>
+      <div class="panel">
+        <div style="font-size:13px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">Resumen</div>
+        <table id="tablaDias"></table>
+        <div class="callout" style="margin-top:16px;" id="diasCallout"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title"><span class="num">05</span><h2>Reitero Resuelto por el Mismo Tecnico</h2></div>
+    <p class="section-desc">De las reincidencias con la 2da reparacion identificada, si volvio el mismo tecnico o si tuvo que intervenir otro.</p>
+    <div class="grid-2">
+      <div class="panel" style="height:300px;"><canvas id="chartMismo"></canvas></div>
+      <div class="panel">
+        <div style="font-size:13px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">Por causa</div>
+        <table id="tablaMismo"></table>
+        <div class="callout" style="margin-top:16px;" id="mismoCallout"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title"><span class="num">06</span><h2>Ranking de Tecnicos por Tasa de Reincidencia (min. 10 reparaciones)</h2></div>
+    <p class="section-desc">Ordenado de menor a mayor tasa dentro de cada agencia. Base para reconocimiento y para focalizar coaching/capacitacion.</p>
+    <div id="tecnicosPorAgencia"></div>
+  </section>
+
+  <section>
+    <div class="section-title"><span class="num">07</span><h2>Mejor y Menor Desempeno</h2></div>
+    <p class="section-desc">Tecnicos con minimo 10 reparaciones, ordenados por su tasa de reincidencia.</p>
+    <div class="perf-grid">
+      <div>
+        <div class="perf-col-title top">🟢 Mejor desempeno</div>
+        <div id="topTecnicos"></div>
+      </div>
+      <div>
+        <div class="perf-col-title bottom">🔴 Menor desempeno</div>
+        <div id="bottomTecnicos"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title"><span class="num">08</span><h2>Conclusiones y Recomendaciones</h2></div>
+    <div class="rec-list" id="recList"></div>
+  </section>
+</main>
+
+<footer id="footerText"></footer>
+
+<script>
+const DATA = {"archivoOrigen":"p23-averias-reiteradas_1_COBRA_2026-08.csv","generadoEl":"14-08-2026, 11:50:27 p. m.","periodo":"2026-06-15 al 2026-07-31","agencias_lista":"PUNTA ARENAS y COYHAIQUE y sin informacion","meta":4,"totalReparaciones":1071,"totalReincidencias":72,"tasaGlobal":6.7,"diasPromedio":7.5,"diasMediana":5,"pctDentro7":66.7,"mismoPct":58,"mismoTotal":50,"agencias":[{"agencia":"COYHAIQUE","total":81,"reincidencias":8,"tasa":9.9},{"agencia":"PUNTA ARENAS","total":988,"reincidencias":64,"tasa":6.5},{"agencia":"sin informacion","total":2,"reincidencias":0,"tasa":0}],"causas":[{"causa":"IPTV - PROBLEMA DE CONEXION","total":3,"reincidencias":1,"tasa":33.3},{"causa":"BA-PROBLEMA MODEM","total":226,"reincidencias":16,"tasa":7.1},{"causa":"FO SIN POTENCIA","total":500,"reincidencias":34,"tasa":6.8},{"causa":"sin informacion","total":15,"reincidencias":1,"tasa":6.7},{"causa":"BA-PROBLEMA CONEXION","total":308,"reincidencias":20,"tasa":6.5},{"causa":"IPTV - PROBLEMA DE IMAGEN Y SENAL","total":1,"reincidencias":0,"tasa":0},{"causa":"BA-PROBLEMA NAVEGACION","total":8,"reincidencias":0,"tasa":0},{"causa":"PROBLEMA REPETIDOR","total":6,"reincidencias":0,"tasa":0},{"causa":"IPTV - PROBLEMAS EQUIPOS","total":3,"reincidencias":0,"tasa":0},{"causa":"IPTV - CONFIGURACION","total":1,"reincidencias":0,"tasa":0}],"subcausas":[{"subcausa":"BA-INTERMITENCIA - FO - 90057","total":21,"reincidencias":3,"tasa":14.3},{"subcausa":"BA-CABLE INT/ ROSETA OPTICA - FO -97918","total":62,"reincidencias":8,"tasa":12.9},{"subcausa":"BA-MODEM DANADO - FO - 90057","total":226,"reincidencias":16,"tasa":7.1},{"subcausa":"sin informacion","total":15,"reincidencias":1,"tasa":6.7},{"subcausa":"BA-NO NAVEGA - FO - 97918","total":297,"reincidencias":18,"tasa":6.1},{"subcausa":"BA-CABLE INT/ ROSETA OPTICA - FO -90057","total":268,"reincidencias":16,"tasa":6},{"subcausa":"DESPACHO TEC REQUERIDO BOT WHATSAPP - FO - 97918","total":85,"reincidencias":5,"tasa":5.9},{"subcausa":"DESPACHO TEC REQUERIDO MI MOVISTAR - FO - 97918","total":56,"reincidencias":3,"tasa":5.4},{"subcausa":"BA-LENTITUD GENERAL - FO - 90057","total":8,"reincidencias":0,"tasa":0},{"subcausa":"BA-POTENCIA BAJA - FO - 90057","total":8,"reincidencias":0,"tasa":0},{"subcausa":"ATENCION REPETIDOR TERRENO - FO - 90057","total":6,"reincidencias":0,"tasa":0},{"subcausa":"DESPACHO TEC REQUERIDO MI MOVISTAR - FO - 90057","total":7,"reincidencias":0,"tasa":0}],"diasBuckets":[{"label":"0-1 dias","count":19,"pct":26.4},{"label":"2-3 dias","count":10,"pct":13.9},{"label":"4-7 dias","count":19,"pct":26.4},{"label":"8-15 dias","count":11,"pct":15.3},{"label":"16-30 dias","count":13,"pct":18.1}],"mismoPorCausa":[{"causa":"BA-PROBLEMA MODEM","total":11,"mismo":9,"tasa":81.8},{"causa":"BA-PROBLEMA CONEXION","total":13,"mismo":9,"tasa":69.2},{"causa":"FO SIN POTENCIA","total":25,"mismo":11,"tasa":44}],"tecnicos":[{"tecnico":"MARCOS ALEJANDRO AGUILAR ROA","agencia":"PUNTA ARENAS","total":36,"reincidencias":6,"tasa":16.7},{"tecnico":"JULIO LOPEZ CORTES","agencia":"COYHAIQUE","total":46,"reincidencias":6,"tasa":13},{"tecnico":"CARLOS ALFONSO PINTO AGUILAR","agencia":"PUNTA ARENAS","total":31,"reincidencias":4,"tasa":12.9},{"tecnico":"LUIS ALFONSO BARRIENTOS MUNOZ","agencia":"PUNTA ARENAS","total":39,"reincidencias":5,"tasa":12.8},{"tecnico":"LUCAS RENATO SERON VELASQUEZ","agencia":"PUNTA ARENAS","total":47,"reincidencias":5,"tasa":10.6},{"tecnico":"VICTOR HUGO BARRIA ALMONACID","agencia":"PUNTA ARENAS","total":84,"reincidencias":8,"tasa":9.5},{"tecnico":"CARLOS ROBERTO SALDIVIA HERNANDEZ","agencia":"PUNTA ARENAS","total":33,"reincidencias":3,"tasa":9.1},{"tecnico":"ROBERTO ESTEBAN DIAZ GARRIDO","agencia":"PUNTA ARENAS","total":38,"reincidencias":3,"tasa":7.9},{"tecnico":"EGON RODRIGO VILLARROEL ZUNIGA","agencia":"PUNTA ARENAS","total":56,"reincidencias":4,"tasa":7.1},{"tecnico":"RODRIGO EDUARDO GODOY CARCAMO","agencia":"PUNTA ARENAS","total":71,"reincidencias":5,"tasa":7},{"tecnico":"MARCELO FERNANDO CARDENAS LLANCALAHUEN","agencia":"PUNTA ARENAS","total":31,"reincidencias":2,"tasa":6.5},{"tecnico":"AXEL LEONARDO ALFARO ALVAREZ","agencia":"COYHAIQUE","total":35,"reincidencias":2,"tasa":5.7},{"tecnico":"EDUARDO ANDRES WITTO MANSILLA","agencia":"PUNTA ARENAS","total":56,"reincidencias":3,"tasa":5.4},{"tecnico":"JOSE ALEXIS BARRIA ALMONACID","agencia":"PUNTA ARENAS","total":76,"reincidencias":4,"tasa":5.3},{"tecnico":"JOAN JOEL HERNANDEZ AMAYA","agencia":"PUNTA ARENAS","total":39,"reincidencias":2,"tasa":5.1},{"tecnico":"GONZALO RODRIGO CARCAMO MALDONADO","agencia":"PUNTA ARENAS","total":43,"reincidencias":2,"tasa":4.7},{"tecnico":"MIGUEL ALEJANDRO ALVARADO VIVAR","agencia":"PUNTA ARENAS","total":45,"reincidencias":2,"tasa":4.4},{"tecnico":"FELIPE ANTONIO RIOS CIFUENTES","agencia":"PUNTA ARENAS","total":48,"reincidencias":2,"tasa":4.2},{"tecnico":"JUAN CARLOS ULLOA MORAGA","agencia":"PUNTA ARENAS","total":34,"reincidencias":1,"tasa":2.9},{"tecnico":"RENE EDUARDO MAYORGA LEUQUEN","agencia":"PUNTA ARENAS","total":41,"reincidencias":1,"tasa":2.4},{"tecnico":"GABRIEL LEONIDAS RAMIREZ IBARRA","agencia":"PUNTA ARENAS","total":47,"reincidencias":1,"tasa":2.1},{"tecnico":"LUIS ALFONSO TORRES MILLAQUEN","agencia":"PUNTA ARENAS","total":54,"reincidencias":1,"tasa":1.9},{"tecnico":"RONIEL JESUS DIAZ SUAREZ","agencia":"PUNTA ARENAS","total":35,"reincidencias":0,"tasa":0},{"tecnico":"WILSON ANDRES LABRA GONZALEZ PTA","agencia":"sin informacion","total":2,"reincidencias":0,"tasa":0},{"tecnico":"SERGIO ANTONIO GALLARDO ASTORGA PTA","agencia":"PUNTA ARENAS","total":4,"reincidencias":0,"tasa":0}],"highlights":{"top":[{"tecnico":"RONIEL JESUS DIAZ SUAREZ","tasa":0,"total":35,"reincidencias":0,"nota":"Sin reincidencias en 35 reparaciones"},{"tecnico":"LUIS ALFONSO TORRES MILLAQUEN","tasa":1.9,"total":54,"reincidencias":1,"nota":"Su reincidencia mas frecuente: BA-PROBLEMA MODEM (1 caso)"},{"tecnico":"GABRIEL LEONIDAS RAMIREZ IBARRA","tasa":2.1,"total":47,"reincidencias":1,"nota":"Su reincidencia mas frecuente: FO SIN POTENCIA (1 caso)"},{"tecnico":"RENE EDUARDO MAYORGA LEUQUEN","tasa":2.4,"total":41,"reincidencias":1,"nota":"Su reincidencia mas frecuente: BA-PROBLEMA CONEXION (1 caso)"}],"bottom":[{"tecnico":"MARCOS ALEJANDRO AGUILAR ROA","tasa":16.7,"total":36,"reincidencias":6,"nota":"Su reincidencia mas frecuente: FO SIN POTENCIA (4 casos)"},{"tecnico":"JULIO LOPEZ CORTES","tasa":13,"total":46,"reincidencias":6,"nota":"Su reincidencia mas frecuente: FO SIN POTENCIA (4 casos)"},{"tecnico":"CARLOS ALFONSO PINTO AGUILAR","tasa":12.9,"total":31,"reincidencias":4,"nota":"Su reincidencia mas frecuente: FO SIN POTENCIA (3 casos)"},{"tecnico":"LUIS ALFONSO BARRIENTOS MUNOZ","tasa":12.8,"total":39,"reincidencias":5,"nota":"Su reincidencia mas frecuente: FO SIN POTENCIA (4 casos)"}]},"conclusiones":["Tasa global de reincidencia: <strong>6.7%</strong> — <span class=\"bad-text\">NO CUMPLE</span> la meta del 4% (72 de 1071 reparaciones reincidieron dentro de 30 dias).","La agencia con mayor tasa es <strong>COYHAIQUE</strong> con 9.9% (8/81).","La causa que mas reincide es <strong>IPTV - PROBLEMA DE CONEXION</strong> con 33.3%.","La subcausa mas critica (con al menos 5 casos) es <strong>BA-INTERMITENCIA - FO - 90057</strong> con 14.3%.","El tecnico con mayor tasa de reincidencia (minimo 10 reparaciones) es <strong>MARCOS ALEJANDRO AGUILAR ROA</strong> con 16.7% (6/36).","El mejor desempeno (minimo 10 reparaciones) es de <strong>RONIEL JESUS DIAZ SUAREZ</strong> con 0.0%.","En promedio, una reincidencia ocurre a los <strong>7.5 dias</strong>; el 67% ocurre dentro de la primera semana.","<strong>VICTOR HUGO BARRIA ALMONACID</strong> tiene el promedio mas bajo de dias hasta reincidir (2.3 dias en 8 casos) — posible senal de reparaciones que no resuelven el problema de fondo.","De los casos con dato completo, el <strong>58%</strong> de las reincidencias fueron re-atendidas por el mismo tecnico que hizo la reparacion original.","En <strong>BA-PROBLEMA MODEM</strong>, el 82% de las reincidencias las resuelve el mismo tecnico que hizo la reparacion original."]};
+
+function npsClass(v, meta){ return v<=meta ? 'hi' : (v<=meta*2 ? 'mid' : 'lo'); }
+function titleCase(s){ return s.split(' ').map(w=>w?w[0]+w.slice(1).toLowerCase():w).join(' '); }
+
+document.getElementById('metaRow').innerHTML = `
+  <span>📅 Periodo analizado: <b>${DATA.periodo}</b></span>
+  <span>📍 Agencias: <b>${DATA.agencias_lista}</b></span>
+  <span>🧾 Base: <b>${DATA.totalReparaciones} reparaciones</b> · ${DATA.totalReincidencias} reincidencias</span>
+  <span>🧮 Formula: <b>Reincidencias / Total de reparaciones</b></span>
+`;
+
+const fontColor = '#6b7a8c';
+Chart.defaults.color = fontColor;
+Chart.defaults.borderColor = 'rgba(20,50,80,0.06)';
+Chart.defaults.font.family = "'Segoe UI', Arial, sans-serif";
+
+// ---- KPI cards ----
+const metaGap = +(DATA.tasaGlobal - DATA.meta).toFixed(1);
+const metaSub = metaGap <= 0
+  ? `<span style="color:var(--promotor)">▼ ${Math.abs(metaGap)} pts bajo la meta (${DATA.meta}%) — cumple</span>`
+  : `<span style="color:var(--detractor)">▲ ${metaGap} pts sobre la meta (${DATA.meta}%) — no cumple</span>`;
+document.getElementById('kpiGrid').innerHTML = `
+  <div class="kpi-card"><div class="label">Tasa Global de Reincidencia</div><div class="value hl">${DATA.tasaGlobal}%</div><div class="sub">${metaSub}</div></div>
+  <div class="kpi-card"><div class="label">Total Reparaciones</div><div class="value">${DATA.totalReparaciones}</div><div class="sub">Periodo ${DATA.periodo}</div></div>
+  <div class="kpi-card"><div class="label">Reincidencias (30d)</div><div class="value">${DATA.totalReincidencias}</div><div class="sub">Reparaciones que volvieron a fallar</div></div>
+  <div class="kpi-card"><div class="label">Dias Prom. hasta Reitero</div><div class="value">${DATA.diasPromedio ?? '-'}</div><div class="sub">Mediana: ${DATA.diasMediana ?? '-'} dias · ${DATA.pctDentro7}% dentro de 7 dias</div></div>
+  <div class="kpi-card"><div class="label">% Mismo Tecnico en Reitero</div><div class="value">${DATA.mismoPct ?? '-'}%</div><div class="sub">${DATA.mismoTotal} casos con dato completo</div></div>
+`;
+
+// ---- Chart 01: Agencia ----
+new Chart(document.getElementById('chartAgencia'), {
+  type: 'bar',
+  data: {
+    labels: DATA.agencias.map(a=>a.agencia),
+    datasets: [
+      { label:'Tasa de reincidencia (%)', data: DATA.agencias.map(a=>a.tasa), backgroundColor: DATA.agencias.map(a=> a.tasa<=DATA.meta ? 'rgba(31,169,113,0.85)' : 'rgba(226,82,62,0.85)'), borderRadius:6, maxBarThickness:60 },
+      { label:'Meta ('+DATA.meta+'%)', data: DATA.agencias.map(()=>DATA.meta), type:'line', borderColor:'#e2523e', borderDash:[5,4], borderWidth:1.5, pointRadius:0, tension:0 }
+    ]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ position:'top', labels:{boxWidth:10} } },
+    scales:{ y:{ min:0, title:{display:true,text:'Tasa %'}, grid:{color:'rgba(20,50,80,0.06)'} } }
+  }
+});
+let rowsAg = '<tr><th>Agencia</th><th>Tasa</th><th>vs. Meta</th><th>Reparaciones</th></tr>';
+DATA.agencias.slice().sort((a,b)=>a.tasa-b.tasa).forEach(a=>{
+  const gap = +(a.tasa - DATA.meta).toFixed(1);
+  const gapTxt = gap<=0 ? `<span style="color:var(--promotor)">${gap}</span>` : `<span style="color:var(--detractor)">+${gap}</span>`;
+  rowsAg += `<tr><td>${a.agencia}</td><td><span class="badge ${npsClass(a.tasa,DATA.meta)}">${a.tasa}%</span></td><td>${gapTxt}</td><td>${a.total}</td></tr>`;
+});
+document.getElementById('tablaAgencia').innerHTML = rowsAg;
+const agBajoMeta = DATA.agencias.filter(a=>a.tasa > DATA.meta);
+document.getElementById('agenciaCallout').innerHTML = agBajoMeta.length
+  ? `<b>Sobre la meta:</b> ${agBajoMeta.map(a=>`${a.agencia} (${a.tasa}%)`).join(' y ')} supera el ${DATA.meta}% institucional.`
+  : `<b>Todas las agencias dentro de la meta</b> de ${DATA.meta}% este periodo.`;
+
+// ---- Chart 02: Causa ----
+new Chart(document.getElementById('chartCausa'), {
+  type: 'bar',
+  data: {
+    labels: DATA.causas.map(c=>c.causa),
+    datasets: [
+      { label:'Tasa de reincidencia (%)', data: DATA.causas.map(c=>c.tasa), backgroundColor: DATA.causas.map(c=> c.tasa<=DATA.meta ? 'rgba(31,169,113,0.85)' : 'rgba(226,82,62,0.85)'), borderRadius:5, maxBarThickness:26 },
+      { label:'Meta ('+DATA.meta+'%)', data: DATA.causas.map(()=>DATA.meta), type:'line', borderColor:'#e2523e', borderDash:[5,4], borderWidth:1.5, pointRadius:0, tension:0 }
+    ]
+  },
+  options: {
+    indexAxis:'y', responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ position:'top', labels:{boxWidth:10} } },
+    scales:{ x:{ min:0, title:{display:true,text:'Tasa %'}, grid:{color:'rgba(20,50,80,0.06)'} } }
+  }
+});
+let rowsCa = '<tr><th>Causa</th><th>Tasa</th><th>Reincidencias</th><th>Total</th></tr>';
+DATA.causas.slice().sort((a,b)=>b.tasa-a.tasa).forEach(c=>{
+  rowsCa += `<tr><td>${c.causa}</td><td><span class="badge ${npsClass(c.tasa,DATA.meta)}">${c.tasa}%</span></td><td>${c.reincidencias}</td><td>${c.total}</td></tr>`;
+});
+document.getElementById('tablaCausa').innerHTML = rowsCa;
+const peorCausaC = DATA.causas.slice().sort((a,b)=>b.tasa-a.tasa)[0];
+document.getElementById('causaCallout').innerHTML = peorCausaC
+  ? `<b>Foco principal:</b> ${peorCausaC.causa} tiene la mayor tasa de reincidencia (${peorCausaC.tasa}%, ${peorCausaC.reincidencias} de ${peorCausaC.total} reparaciones).`
+  : '';
+
+// ---- Chart 03: Subcausa ----
+const subOrd = DATA.subcausas.slice().sort((a,b)=>b.tasa-a.tasa);
+new Chart(document.getElementById('chartSubcausa'), {
+  type: 'bar',
+  data: {
+    labels: subOrd.map(s=>s.subcausa),
+    datasets: [
+      { label:'Tasa de reincidencia (%)', data: subOrd.map(s=>s.tasa), backgroundColor: subOrd.map(s=> s.tasa<=DATA.meta ? 'rgba(31,169,113,0.85)' : 'rgba(226,82,62,0.85)'), borderRadius:5, maxBarThickness:22 },
+      { label:'Meta ('+DATA.meta+'%)', data: subOrd.map(()=>DATA.meta), type:'line', borderColor:'#e2523e', borderDash:[5,4], borderWidth:1.5, pointRadius:0, tension:0 }
+    ]
+  },
+  options: {
+    indexAxis:'y', responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ position:'top', labels:{boxWidth:10} } },
+    scales:{ x:{ min:0, title:{display:true,text:'Tasa %'}, grid:{color:'rgba(20,50,80,0.06)'} } }
+  }
+});
+
+// ---- Chart 04: Dias hasta reiteracion ----
+new Chart(document.getElementById('chartDias'), {
+  type: 'bar',
+  data: {
+    labels: DATA.diasBuckets.map(b=>b.label),
+    datasets: [
+      { label:'Casos', data: DATA.diasBuckets.map(b=>b.count), backgroundColor:'rgba(0,113,206,0.85)', borderRadius:6, maxBarThickness:60 }
+    ]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ display:false } },
+    scales:{ y:{ min:0, title:{display:true,text:'N° de casos'}, grid:{color:'rgba(20,50,80,0.06)'} } }
+  }
+});
+document.getElementById('tablaDias').innerHTML = `
+  <tr><th>Indicador</th><th>Valor</th></tr>
+  <tr><td>Promedio</td><td>${DATA.diasPromedio ?? '-'} dias</td></tr>
+  <tr><td>Mediana</td><td>${DATA.diasMediana ?? '-'} dias</td></tr>
+  <tr><td>Dentro de 7 dias</td><td><span class="badge ${DATA.pctDentro7>=60?'lo':'mid'}">${DATA.pctDentro7}%</span></td></tr>
+`;
+document.getElementById('diasCallout').innerHTML =
+  `<b>${DATA.pctDentro7}%</b> de las reincidencias ocurre dentro de la primera semana. Cuanto mas alto este numero, mas senal de que la reparacion original no resolvio el problema de fondo (no de una falla nueva).`;
+
+// ---- Chart 05: Mismo tecnico (donut) ----
+new Chart(document.getElementById('chartMismo'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Mismo tecnico', 'Tecnico distinto'],
+    datasets: [{ data: [DATA.mismoPct, +(100-DATA.mismoPct).toFixed(1)], backgroundColor: ['#e2523e','#1fa971'], borderWidth:0 }]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ position:'bottom', labels:{boxWidth:10} } },
+    cutout: '62%'
+  }
+});
+let rowsMi = '<tr><th>Causa</th><th>% Mismo Tecnico</th><th>Casos</th></tr>';
+DATA.mismoPorCausa.forEach(m=>{
+  rowsMi += `<tr><td>${m.causa}</td><td><span class="badge ${m.tasa>=50?'lo':'hi'}">${m.tasa}%</span></td><td>${m.mismo}/${m.total}</td></tr>`;
+});
+document.getElementById('tablaMismo').innerHTML = rowsMi;
+document.getElementById('mismoCallout').innerHTML =
+  `<b>${DATA.mismoPct}%</b> de las reincidencias con dato completo fueron re-atendidas por el mismo tecnico que hizo la reparacion original — señal de que no resolvio el problema a la primera.`;
+
+// ---- Tabla: Tecnicos por agencia ----
+const agenciasOrden = DATA.agencias.slice().sort((a,b)=>b.total-a.total).map(a=>a.agencia);
+let tecnicosHtml = '';
+agenciasOrden.forEach(agencia => {
+  const tecsAg = DATA.tecnicos.filter(t=>t.agencia===agencia && t.total>=10).sort((a,b)=>a.tasa-b.tasa);
+  if (!tecsAg.length) return;
+  let rowsTec = '<tr><th>#</th><th>Tecnico</th><th>Tasa</th><th>Reparaciones</th><th>Reincidencias</th></tr>';
+  tecsAg.forEach((t,i)=>{
+    rowsTec += `<tr>
+      <td>${i+1}</td>
+      <td>${titleCase(t.tecnico)}</td>
+      <td><span class="badge ${npsClass(t.tasa,DATA.meta)}">${t.tasa}%</span></td>
+      <td>${t.total}</td>
+      <td>${t.reincidencias}</td>
+    </tr>`;
+  });
+  tecnicosHtml += `<div class="panel" style="margin-bottom:16px;">
+    <div style="font-size:13px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">${agencia} · ${tecsAg.length} tecnico${tecsAg.length===1?'':'s'} (min. 10 reparaciones)</div>
+    <table>${rowsTec}</table>
+  </div>`;
+});
+document.getElementById('tecnicosPorAgencia').innerHTML = tecnicosHtml;
+
+// ---- Highlights: top / bottom tecnicos ----
+function techCard(t, kind){
+  const cls = kind==='top' ? 'hi' : 'lo';
+  return `<div class="tech-card ${kind==='top'?'top-card':'bottom-card'}">
+    <div class="tech-head"><span class="tech-name">${titleCase(t.tecnico)}</span><span class="tech-nps ${cls}">${t.tasa}%</span></div>
+    <div class="tech-meta">${t.total} reparaciones · ${t.reincidencias} reincidencia${t.reincidencias===1?'':'s'}</div>
+    <div class="tech-quote">${t.nota}</div>
+  </div>`;
+}
+document.getElementById('topTecnicos').innerHTML = DATA.highlights.top.map(t=>techCard(t,'top')).join('');
+document.getElementById('bottomTecnicos').innerHTML = DATA.highlights.bottom.map(t=>techCard(t,'bottom')).join('');
+
+// ---- Conclusiones ----
+document.getElementById('recList').innerHTML = DATA.conclusiones.map((c,i)=>`
+  <div class="rec-item"><div class="idx">${i+1}</div><p>${c}</p></div>
+`).join('');
+
+// ---- Footer ----
+document.getElementById('footerText').innerHTML =
+  `Informe generado a partir de ${DATA.archivoOrigen} · ${DATA.agencias_lista} · Generado ${DATA.generadoEl}`;
+</script>
+
+</body>
+</html>
