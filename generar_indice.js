@@ -67,6 +67,16 @@ function tarjeta({ href, disponible, titulo, descripcion, meta, actualizado, mes
   </a>`;
 }
 
+function tarjetaExterna({ href, icono, titulo, descripcion, nota }) {
+  return `<a class="card" href="${href}" target="_blank" rel="noopener">
+    <div class="card-icon">${icono}</div>
+    <h2>${titulo}</h2>
+    <p>${descripcion}</p>
+    <div class="card-meta">${nota}</div>
+    <div class="card-cta">Ver informe &rarr;</div>
+  </a>`;
+}
+
 const html = `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -142,6 +152,20 @@ const html = `<!DOCTYPE html>
       meta: '2.5%',
       actualizado: actualizadoInfancia,
       meses: mesesInfancia.length,
+    })}
+    ${tarjetaExterna({
+      href: 'https://jhonasvk.github.io/dashboard-auditorias/',
+      icono: '🧾',
+      titulo: 'Auditorias de Terreno',
+      descripcion: 'Dashboard de auditorias en terreno: nota promedio por tecnico, top hallazgos e incumplimientos por supervisor.',
+      nota: 'Sitio externo',
+    })}
+    ${tarjetaExterna({
+      href: 'https://jhonasvk.github.io/informe-nps/',
+      icono: '⭐',
+      titulo: 'Informe NPS',
+      descripcion: 'Net Promoter Score de las intervenciones tecnicas: evolucion diaria/semanal, desglose por zona y ranking de tecnicos.',
+      nota: 'Sitio externo',
     })}
   </div>
 </main>
