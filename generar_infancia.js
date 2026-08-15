@@ -806,7 +806,7 @@ async function main() {
     <div class="brand-divider"></div>
     <div class="eyebrow">Calidad &amp; Capacitacion · Analisis de Averias de Infancia</div>
   </div>
-  <h1>Informe de Averias de Infancia — COBRA</h1>
+  <h1>Informe de Averias de Infancia</h1>
   <div class="subtitle">Instalaciones de Fibra Optica que generaron una reparacion dentro de su periodo de infancia (los dias siguientes a la instalacion), a partir de los registros de COBRA. Incluye tasa de infancia por agencia, producto y tecnico instalador, distribucion de causas y claves de cierre de la reparacion, tiempos hasta la falla, y si la resolvio el mismo tecnico que instalo.</div>
   <div class="meta-row" id="metaRow"></div>
   <div class="archive-row no-print" id="archiveRow"></div>
