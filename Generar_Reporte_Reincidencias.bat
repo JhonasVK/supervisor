@@ -45,6 +45,45 @@ if errorlevel 1 (
 )
 
 echo.
-echo Listo. Se generaron los Excel nuevos y se actualizaron los dashboards.
-echo Abre index.html con doble clic para elegir el informe que quieres ver.
+echo ========================================================
+echo   Publicando en GitHub Pages...
+echo ========================================================
+echo.
+
+git --version >nul 2>&1
+if errorlevel 1 (
+    echo No se encontro Git instalado. Los informes se generaron localmente
+    echo pero no se publicaron. Descarga Git desde https://git-scm.com
+    pause
+    exit /b 0
+)
+
+echo [1/3] Registrando cambios...
+git add .
+echo       OK
+
+echo [2/3] Guardando version con fecha y hora...
+for /f "tokens=1-3 delims=/" %%a in ('date /t') do set FECHA=%%c-%%b-%%a
+for /f "tokens=1-2 delims=: " %%a in ('time /t') do set HORA=%%a:%%b
+git commit -m "Actualizacion %FECHA% %HORA%"
+
+echo [3/3] Subiendo a GitHub...
+git push origin master
+if errorlevel 1 (
+    echo.
+    echo No se pudo subir a GitHub. Verifica tu conexion, o si no habia
+    echo cambios nuevos que publicar, esto es normal.
+    pause
+    exit /b 0
+)
+
+echo.
+echo ========================================================
+echo   Listo! Informes actualizados y publicados
+echo ========================================================
+echo.
+echo  Local:  abre index.html con doble clic
+echo  Web:    https://jhonasvk.github.io/informe-averias/
+echo  (la version web tarda ~1 minuto en actualizarse)
+echo.
 pause

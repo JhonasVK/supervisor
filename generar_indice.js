@@ -7,6 +7,39 @@ const path = require('path');
 
 const carpeta = __dirname;
 
+const NOMBRES_MES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+function nombreMes(slug) {
+  const [y, m] = slug.split('-');
+  return NOMBRES_MES[parseInt(m, 10) - 1] + ' ' + y;
+}
+
+function listarMeses(prefijo) {
+  const re = new RegExp('^' + prefijo + '_(\\d{4}-\\d{2})\\.html$');
+  const slugs = fs.readdirSync(carpeta)
+    .map((f) => f.match(re))
+    .filter(Boolean)
+    .map((m) => m[1])
+    .sort()
+    .reverse();
+  return slugs.map((slug) => ({
+    slug,
+    label: nombreMes(slug),
+    url: `${prefijo}_${slug}.html`,
+  }));
+}
+
+// meses.json queda disponible para que cada dashboard (incluidos los archivados,
+// que ya no se regeneran) puedan consultar en vivo la lista completa y actualizada
+// de meses disponibles, en vez de depender de la lista que tenian embebida al nacer.
+const mesesReincidencias = listarMeses('Dashboard_Reincidencias');
+const mesesInfancia = listarMeses('Dashboard_Infancia');
+fs.writeFileSync(
+  path.join(carpeta, 'meses.json'),
+  JSON.stringify({ reincidencias: mesesReincidencias, infancia: mesesInfancia }),
+  'utf8'
+);
+console.log('meses.json generado:', mesesReincidencias.length, 'meses de reincidencias,', mesesInfancia.length, 'meses de infancia');
+
 function fechaArchivo(nombre) {
   const p = path.join(carpeta, nombre);
   if (!fs.existsSync(p)) return null;
@@ -16,7 +49,7 @@ function fechaArchivo(nombre) {
 const actualizadoReincidencias = fechaArchivo('Dashboard_Reincidencias.html');
 const actualizadoInfancia = fechaArchivo('Dashboard_Infancia.html');
 
-function tarjeta({ href, disponible, titulo, descripcion, meta, actualizado }) {
+function tarjeta({ href, disponible, titulo, descripcion, meta, actualizado, meses }) {
   if (!disponible) {
     return `<div class="card disabled">
       <div class="card-icon">📄</div>
@@ -29,7 +62,7 @@ function tarjeta({ href, disponible, titulo, descripcion, meta, actualizado }) {
     <div class="card-icon">📊</div>
     <h2>${titulo}</h2>
     <p>${descripcion}</p>
-    <div class="card-meta">Meta: ${meta} &nbsp;•&nbsp; Actualizado: ${actualizado}</div>
+    <div class="card-meta">Meta: ${meta} &nbsp;•&nbsp; ${meses} mes${meses === 1 ? '' : 'es'} de historial &nbsp;•&nbsp; Actualizado: ${actualizado}</div>
     <div class="card-cta">Ver informe &rarr;</div>
   </a>`;
 }
@@ -99,6 +132,7 @@ const html = `<!DOCTYPE html>
       descripcion: 'Reparaciones que volvieron a fallar dentro de 30 dias: tasa por agencia/causa/tecnico, tiempo hasta la reiteracion y si la atendio el mismo tecnico.',
       meta: '4%',
       actualizado: actualizadoReincidencias,
+      meses: mesesReincidencias.length,
     })}
     ${tarjeta({
       href: 'Dashboard_Infancia.html',
@@ -107,6 +141,7 @@ const html = `<!DOCTYPE html>
       descripcion: 'Instalaciones que generaron una reparacion dentro de su periodo de infancia: tasa por agencia/producto/tecnico instalador, causas y tiempo hasta la falla.',
       meta: '2.5%',
       actualizado: actualizadoInfancia,
+      meses: mesesInfancia.length,
     })}
   </div>
 </main>

@@ -85,6 +85,29 @@ function timestamp() {
   );
 }
 
+const NOMBRES_MES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+function nombreMes(slug) {
+  const [y, m] = slug.split('-');
+  return NOMBRES_MES[parseInt(m, 10) - 1] + ' ' + y;
+}
+
+// El "mes" del informe se toma de partition_date del CSV (la fecha del snapshot de datos),
+// no de la fecha del sistema, para que el historial quede ligado a los datos reales.
+function obtenerSlugDesdeCsv(rows) {
+  const pd = (rows[0] && rows[0]['partition_date']) || '';
+  if (/^\d{4}-\d{2}/.test(pd)) return pd.slice(0, 7);
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
+
+function listarMesesExistentes(carpeta, prefijo) {
+  const re = new RegExp('^' + prefijo + '_(\\d{4}-\\d{2})\\.html$');
+  return fs.readdirSync(carpeta)
+    .map((f) => f.match(re))
+    .filter(Boolean)
+    .map((m) => m[1]);
+}
+
 function escapeHtml(s) {
   return String(s)
     .replace(/&/g, '&amp;')
@@ -770,10 +793,21 @@ async function main() {
     };
   });
 
+  const periodoSlug = obtenerSlugDesdeCsv(rows);
+  const slugsExistentes = new Set(listarMesesExistentes(carpeta, 'Dashboard_Reincidencias'));
+  slugsExistentes.add(periodoSlug);
+  const archivos = [...slugsExistentes].sort().reverse().map((s) => ({
+    slug: s,
+    label: nombreMes(s),
+    url: s === periodoSlug ? 'Dashboard_Reincidencias.html' : `Dashboard_Reincidencias_${s}.html`,
+  }));
+
   const DATA = {
     archivoOrigen: path.basename(csvPath),
     generadoEl: new Date().toLocaleString('es-CL'),
     periodo: periodoStr,
+    periodoSlug,
+    archivos,
     agencias_lista: agenciasLista,
     meta: +(META * 100).toFixed(0),
     totalReparaciones: statsGlobal.total,
@@ -851,6 +885,11 @@ async function main() {
   .meta-row span b{color:var(--cobra-navy);}
   .back-link{ display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:var(--cobra-navy); text-decoration:none; margin-bottom:14px; }
   .back-link:hover{ text-decoration:underline; }
+  .archive-row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:16px; }
+  .archive-row .archive-label{ font-size:11.5px; text-transform:uppercase; letter-spacing:.06em; font-weight:700; color:var(--text-dim); margin-right:2px; }
+  .archive-pill{ display:inline-block; font-size:12.5px; font-weight:700; padding:4px 12px; border-radius:20px; text-decoration:none; border:1px solid var(--border); color:var(--cobra-navy); background:#fff; transition:background .15s ease; }
+  .archive-pill:hover{ background:var(--celeste-soft); }
+  .archive-pill.current{ background:var(--cobra-navy); color:#fff; border-color:var(--cobra-navy); cursor:default; }
   main{ padding:36px 6vw 80px; max-width:1280px; margin:0 auto; }
 
   .kpi-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:16px; margin:-58px 0 34px; position:relative; z-index:2; }
@@ -950,6 +989,7 @@ async function main() {
   <h1>Informe de Repetido Reparado — COBRA</h1>
   <div class="subtitle" id="heroSubtitle">Analisis de reparaciones de Fibra Optica que volvieron a fallar dentro de 30 dias, a partir de las reparaciones registradas por COBRA. Incluye tasa de reincidencia por agencia, causa y tecnico, tiempos hasta la reiteracion, y si el reitero lo resolvio el mismo tecnico u otro.</div>
   <div class="meta-row" id="metaRow"></div>
+  <div class="archive-row no-print" id="archiveRow"></div>
 </header>
 
 <main>
@@ -1054,6 +1094,26 @@ document.getElementById('metaRow').innerHTML = \`
   <span>🧾 Base: <b>\${DATA.totalReparaciones} reparaciones</b> · \${DATA.totalReincidencias} reincidencias</span>
   <span>🧮 Formula: <b>Reincidencias / Total de reparaciones</b></span>
 \`;
+
+// ---- Historial de meses ----
+// meses.json se pisa completo en cada corrida del script, asi que se consulta en vivo
+// (fetch) en vez de usar DATA.archivos: un informe archivado (ej. Dashboard_Reincidencias_2026-07.html)
+// nunca se vuelve a regenerar, asi que su DATA embebido quedaria congelado en el
+// historial que existia el dia que se genero.
+function renderArchiveRow(lista) {
+  if (!lista || lista.length < 2) return;
+  const pills = lista.map(a =>
+    a.slug === DATA.periodoSlug
+      ? \`<span class="archive-pill current">\${a.label}</span>\`
+      : \`<a class="archive-pill" href="\${a.url}">\${a.label}</a>\`
+  ).join('');
+  document.getElementById('archiveRow').innerHTML = \`<span class="archive-label">📁 Meses disponibles:</span>\${pills}\`;
+}
+renderArchiveRow(DATA.archivos); // fallback inmediato mientras llega el fetch
+fetch('meses.json', { cache: 'no-store' })
+  .then(r => r.ok ? r.json() : null)
+  .then(data => { if (data && data.reincidencias) renderArchiveRow(data.reincidencias); })
+  .catch(() => {}); // sin conexion o meses.json no existe todavia: se queda con el fallback
 
 const fontColor = '#6b7a8c';
 Chart.defaults.color = fontColor;
@@ -1240,7 +1300,9 @@ document.getElementById('footerText').innerHTML =
 
   const htmlPath = path.join(carpeta, 'Dashboard_Reincidencias.html');
   fs.writeFileSync(htmlPath, html, 'utf8');
-  console.log('Dashboard HTML generado:', htmlPath);
+  const htmlArchivoPath = path.join(carpeta, `Dashboard_Reincidencias_${periodoSlug}.html`);
+  fs.writeFileSync(htmlArchivoPath, html, 'utf8');
+  console.log('Dashboard HTML generado:', htmlPath, 'y', htmlArchivoPath);
 }
 
 main().catch((err) => {
