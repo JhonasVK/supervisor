@@ -123,7 +123,14 @@ async function main() {
   const csvPath = encontrarCsvOrigen();
   console.log('Archivo origen:', csvPath);
 
-  const rows = leerCsv(csvPath);
+  const rowsCrudas = leerCsv(csvPath);
+  // El archivo origen a veces trae filas sueltas de otra empresa (ej. "LARI",
+  // agencia "INDEPENDENCIA") mezcladas con las de COBRA. Se descartan aqui.
+  const filasAjenas = rowsCrudas.filter((r) => (r['empresa_agencia'] || '').trim().toUpperCase() !== 'COBRA');
+  if (filasAjenas.length) {
+    console.log('Filas de otra empresa descartadas:', filasAjenas.length, '(empresa_agencia distinto de COBRA)');
+  }
+  const rows = rowsCrudas.filter((r) => (r['empresa_agencia'] || '').trim().toUpperCase() === 'COBRA');
   // Las instalaciones (Alta) y los traslados (T, tambien involucran una reconexion
   // fisica) cuentan como base para la tasa de infancia. Las Reparaciones (R) no,
   // porque no son una instalacion y quedan fuera del calculo.
@@ -489,6 +496,8 @@ async function main() {
     '',
     'Archivo origen: ' + path.basename(csvPath),
     'Generado: ' + new Date().toLocaleString('es-CL'),
+    '',
+    'Se descartan las filas cuyo "empresa_agencia" no sea COBRA (el archivo origen a veces trae filas sueltas de otras empresas, ej. LARI / agencia INDEPENDENCIA, mezcladas por error). Filas descartadas en esta corrida: ' + filasAjenas.length + '.',
     '',
     'Una "averia de infancia" es una instalacion o traslado (Alta o Traslado) que genero una reparacion (rmdy_*) dentro de su periodo de infancia, segun el campo "infancia" del archivo origen (1 = tuvo reparacion de infancia). El archivo tambien trae Reparaciones (R), que no son una instalacion y quedan fuera de este calculo (no se usan como base de la tasa).',
     '',
