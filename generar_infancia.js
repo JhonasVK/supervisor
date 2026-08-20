@@ -124,17 +124,34 @@ async function main() {
   console.log('Archivo origen:', csvPath);
 
   const rowsCrudas = leerCsv(csvPath);
-  // El archivo origen a veces trae filas sueltas de otra empresa (ej. "LARI",
-  // agencia "INDEPENDENCIA") mezcladas con las de COBRA. Se descartan aqui.
-  const filasAjenas = rowsCrudas.filter((r) => (r['empresa_agencia'] || '').trim().toUpperCase() !== 'COBRA');
+
+  // Criterios acordados con el equipo (misma logica que la consulta Power Query
+  // oficial): solo agencias de la zona SUR, solo filas de COBRA, y se descartan
+  // tecnicos "PTA" (placeholders que han aparecido sueltos en el archivo origen).
+  const AGENCIAS_VALIDAS = ['COYHAIQUE', 'PUNTA ARENAS'];
+  const filasAjenas = rowsCrudas.filter((r) =>
+    !AGENCIAS_VALIDAS.includes((r['toa_xa_original_agency'] || '').trim()) ||
+    (r['toa_xr_company_name'] || '').trim().toUpperCase() !== 'COBRA' ||
+    (r['toa_provider_name'] || '').includes('PTA')
+  );
   if (filasAjenas.length) {
-    console.log('Filas de otra empresa descartadas:', filasAjenas.length, '(empresa_agencia distinto de COBRA)');
+    console.log('Filas descartadas (otra agencia, otra empresa, o tecnico PTA):', filasAjenas.length);
   }
-  const rows = rowsCrudas.filter((r) => (r['empresa_agencia'] || '').trim().toUpperCase() === 'COBRA');
-  // Las instalaciones (Alta) y los traslados (T, tambien involucran una reconexion
-  // fisica) cuentan como base para la tasa de infancia. Las Reparaciones (R) no,
-  // porque no son una instalacion y quedan fuera del calculo.
-  const instalaciones = rows.filter((r) => ['A', 'T'].includes((r['vpi_tipo_trabajo_producto'] || '').trim()));
+  const rows = rowsCrudas.filter((r) =>
+    AGENCIAS_VALIDAS.includes((r['toa_xa_original_agency'] || '').trim()) &&
+    (r['toa_xr_company_name'] || '').trim().toUpperCase() === 'COBRA' &&
+    !(r['toa_provider_name'] || '').includes('PTA')
+  );
+
+  // Las instalaciones (Alta), traslados (T) y tipo B cuentan como base para la
+  // tasa de infancia. Las Reparaciones (R) no, porque no son una instalacion.
+  // Se excluyen ademas ciertas claves de cierre de la reparacion de infancia
+  // que no representan un caso valido (ver lista CLAVES_CIERRE_EXCLUIDAS).
+  const CLAVES_CIERRE_EXCLUIDAS = ['F20', 'F23', '913', '561', 'A12', 'B01', 'B36', 'I50'];
+  const instalaciones = rows.filter((r) =>
+    ['A', 'T', 'B'].includes((r['vpi_tipo_trabajo_producto'] || '').trim()) &&
+    !CLAVES_CIERRE_EXCLUIDAS.includes((r['rmdy_clave_cierre'] || '').trim())
+  );
   const inf = instalaciones.filter((r) => (r['infancia'] || '').trim() === '1');
 
   inf.sort((a, b) => {
@@ -497,7 +514,7 @@ async function main() {
     'Archivo origen: ' + path.basename(csvPath),
     'Generado: ' + new Date().toLocaleString('es-CL'),
     '',
-    'Se descartan las filas cuyo "empresa_agencia" no sea COBRA (el archivo origen a veces trae filas sueltas de otras empresas, ej. LARI / agencia INDEPENDENCIA, mezcladas por error). Filas descartadas en esta corrida: ' + filasAjenas.length + '.',
+    'Se descartan las filas que no sean de agencia COYHAIQUE/PUNTA ARENAS, que no sean de la empresa COBRA (toa_xr_company_name), o cuyo tecnico tenga "PTA" en el nombre (placeholders que han aparecido sueltos en el archivo origen). Ademas, dentro de las instalaciones validas, se excluyen las claves de cierre de reparacion F20/F23/913/561/A12/B01/B36/I50 por no representar un caso valido de infancia. Filas descartadas por agencia/empresa/PTA en esta corrida: ' + filasAjenas.length + '.',
     '',
     'Una "averia de infancia" es una instalacion o traslado (Alta o Traslado) que genero una reparacion (rmdy_*) dentro de su periodo de infancia, segun el campo "infancia" del archivo origen (1 = tuvo reparacion de infancia). El archivo tambien trae Reparaciones (R), que no son una instalacion y quedan fuera de este calculo (no se usan como base de la tasa).',
     '',
