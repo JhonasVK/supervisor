@@ -121,7 +121,34 @@ async function main() {
   const csvPath = encontrarCsvOrigen();
   console.log('Archivo origen:', csvPath);
 
-  const rows = leerCsv(csvPath);
+  const rowsCrudas = leerCsv(csvPath);
+
+  // Criterios acordados con el equipo (misma logica que la consulta Power Query
+  // oficial): solo agencias de la zona SUR, solo tecnologia FO, solo filas de
+  // COBRA, se descartan tecnicos "PTA" (placeholders), y ciertas claves de
+  // cierre (derivadas de rdy_prd_cat_nivel_2_sol) que no representan un caso valido.
+  const AGENCIAS_VALIDAS = ['COYHAIQUE', 'PUNTA ARENAS'];
+  const CLAVES_CIERRE_EXCLUIDAS = ['913', 'F20', 'F23', '561', 'A12', 'B01', 'B36', 'I50'];
+  function tecnologiaFila(r) {
+    return (r['toa_piv_tecnologia'] === 'FO' || r['toa_piv_descripcion'] === 'FO') ? 'FO' : r['toa_piv_tecnologia'];
+  }
+  function claveCierreFila(r) {
+    return (r['rdy_prd_cat_nivel_2_sol'] || '').split('_')[0];
+  }
+  function filaValida(r) {
+    return (
+      AGENCIAS_VALIDAS.includes((r['toa_piv_agencia'] || '').trim()) &&
+      !CLAVES_CIERRE_EXCLUIDAS.includes(claveCierreFila(r)) &&
+      !(r['toa_piv_nombre_tecnico'] || '').includes('PTA') &&
+      tecnologiaFila(r) === 'FO' &&
+      (r['toa_piv_empresa'] || '').trim() === 'COBRA'
+    );
+  }
+  const filasDescartadas = rowsCrudas.filter((r) => !filaValida(r));
+  if (filasDescartadas.length) {
+    console.log('Filas descartadas (agencia, tecnologia, empresa, tecnico PTA o clave de cierre no valida):', filasDescartadas.length);
+  }
+  const rows = rowsCrudas.filter(filaValida);
   const byFolio = {};
   rows.forEach((r) => { byFolio[r['toa_piv_folio_toa']] = r; });
 
@@ -648,6 +675,8 @@ async function main() {
     '',
     'Archivo origen: ' + path.basename(csvPath),
     'Generado: ' + new Date().toLocaleString('es-CL'),
+    '',
+    'Se descartan las filas que no sean de agencia COYHAIQUE/PUNTA ARENAS, que no sean tecnologia FO, que no sean de la empresa COBRA, cuyo tecnico tenga "PTA" en el nombre (placeholders), o cuya clave de cierre (derivada de rdy_prd_cat_nivel_2_sol) sea 913/F20/F23/561/A12/B01/B36/I50. Filas descartadas en esta corrida: ' + filasDescartadas.length + '.',
     '',
     'Cada fila representa un caso donde una reparacion (1ra Reparacion) genero una nueva reparacion (2da Reparacion / Reitero) dentro de los 30 dias siguientes, segun el campo rdy_prd_tiene_reitero_30d del archivo origen.',
     '',
