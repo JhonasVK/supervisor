@@ -888,7 +888,7 @@ async function main() {
 
   <section>
     <div class="section-title"><span class="num">06</span><h2>Ranking de Tecnicos Instaladores por Tasa de Infancia (min. 10 instalaciones)</h2></div>
-    <p class="section-desc">Ordenado de menor a mayor tasa dentro de cada agencia. Base para reconocimiento y para focalizar coaching/capacitacion.</p>
+    <p class="section-desc">Ordenado de mayor a menor tasa dentro de cada agencia. Base para reconocimiento y para focalizar coaching/capacitacion.</p>
     <div id="tecnicosPorAgencia"></div>
   </section>
 
@@ -1081,7 +1081,7 @@ document.getElementById('mismoCallout').innerHTML =
 const agenciasOrden = DATA.agencias.slice().sort((a,b)=>b.total-a.total).map(a=>a.agencia);
 let tecnicosHtml = '';
 agenciasOrden.forEach(agencia => {
-  const tecsAg = DATA.tecnicos.filter(t=>t.agencia===agencia && t.total>=10).sort((a,b)=>a.tasa-b.tasa);
+  const tecsAg = DATA.tecnicos.filter(t=>t.agencia===agencia && t.total>=10).sort((a,b)=>b.tasa-a.tasa);
   if (!tecsAg.length) return;
   let rowsTec = '<tr><th>#</th><th>Tecnico</th><th>Tasa</th><th>Instalaciones</th><th>Infancia</th></tr>';
   tecsAg.forEach((t,i)=>{
