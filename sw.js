@@ -3,8 +3,8 @@
 // fechados (Dashboard_*_YYYY-MM.html) porque esa lista crece cada mes: en vez de
 // eso, cachea cada pagina la primera vez que se visita (con conexion).
 
-const CACHE_VERSION = 'supervisor-v2';
-const NUCLEO = ['./index.html', './auth.js', './manifest.json', './logo-cobra.png', './icon-192.png', './icon-512.png'];
+const CACHE_VERSION = 'supervisor-v3';
+const NUCLEO = ['./index.html', './auth.js', './manifest.json', './logo-cobra.png', './logo-cobra-t.png', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

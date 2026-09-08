@@ -94,7 +94,7 @@
         '<button type="submit" id="supBtn" style="width:100%;padding:11px;border:none;border-radius:9px;background:#0071ce;' +
           'color:#fff;font-size:14px;font-weight:800;cursor:pointer;">Entrar</button>' +
       '</form>' +
-      '<img src="logo-cobra.png" alt="Cobra" style="position:absolute;top:22px;left:26px;height:34px;width:auto;opacity:.95;">';
+      '<img src="logo-cobra-t.png" alt="Cobra" style="position:absolute;top:22px;left:26px;height:34px;width:auto;">';
     document.body.appendChild(ov);
 
     var form = document.getElementById('supLoginForm');
