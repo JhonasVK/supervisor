@@ -949,7 +949,7 @@ function titleCase(s){ return s.split(' ').map(w=>w?w[0]+w.slice(1).toLowerCase(
 // Tecnicos desvinculados: se siguen mostrando en el ranking (su trabajo
 // pasado cuenta igual), solo se les agrega esta nota junto al nombre.
 const DESVINCULADOS = ['JOAN JOEL HERNANDEZ AMAYA', 'LUCAS RENATO SERON VELASQUEZ'];
-function notaDesvinculado(nombre){ return DESVINCULADOS.includes((nombre||'').toUpperCase().trim()) ? ' <span style="color:var(--text-dim);font-weight:400;font-style:italic;">(desvinculado)</span>' : ''; }
+function notaDesvinculado(nombre){ return DESVINCULADOS.includes((nombre||'').toUpperCase().trim()) ? ' <span style="color:var(--detractor);opacity:.7;font-weight:400;font-style:italic;">(desvinculado)</span>' : ''; }
 
 document.getElementById('metaRow').innerHTML = \`
   <span>📅 Periodo analizado: <b>\${DATA.periodo}</b></span>
