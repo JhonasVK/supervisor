@@ -217,6 +217,23 @@ if ('serviceWorker' in navigator) {
     'Cada reto es una oportunidad de aprender 📚',
     'Tu actitud hace la diferencia 🔥',
   ];
+  // Frases especiales por fecha (automatico segun el mes del visitante):
+  // Fiestas Patrias en septiembre, Navidad/Ano Nuevo en diciembre.
+  var FRASES_ESPECIALES = {
+    9: [
+      '¡Viva Chile! Que las Fiestas Patrias te recarguen de energia 🇨🇱🎉',
+      'Dieciocho de septiembre: a celebrar como se merece, con toda la energia del pais 🇨🇱🥟',
+      'Como buen chileno, sigue poniendole empanada y power a cada dia 🇨🇱💪',
+      'Fiestas Patrias: buen momento para parar, celebrar, y volver con toda la energia 🇨🇱',
+    ],
+    12: [
+      '🎄 Feliz Navidad, que este mes cierre con broche de oro',
+      '¡Que el espiritu navideno te acompane en cada visita! 🎅',
+      'Un fin de ano de excelentes resultados para ti y tu familia 🎆',
+      '🎁 Diciembre es para cerrar el ano arriba, sigue asi',
+    ],
+  };
+  var FRASES_MES = FRASES.concat(FRASES_ESPECIALES[new Date().getMonth() + 1] || []);
   var clicks = 0, clickTimer = null;
 
   function mostrarToast(texto) {
@@ -288,7 +305,7 @@ if ('serviceWorker' in navigator) {
         for (var i = 0; i < restantes.length; i++) restantes[i].remove();
         overlay.innerHTML = '<button class="eg-cerrar">✕</button>'
           + '<div class="easter-game-final">🎉 Puntaje final: ' + score + ' estrellas<br>'
-          + '<span style="font-size:14px;font-weight:400;">' + FRASES[Math.floor(Math.random() * FRASES.length)] + '</span><br>'
+          + '<span style="font-size:14px;font-weight:400;">' + FRASES_MES[Math.floor(Math.random() * FRASES_MES.length)] + '</span><br>'
           + '<button id="egCerrarFinal">Cerrar</button></div>';
         overlay.querySelector('#egCerrarFinal').addEventListener('click', function () { overlay.remove(); });
         overlay.querySelector('.eg-cerrar').addEventListener('click', function () { overlay.remove(); });
@@ -307,7 +324,7 @@ if ('serviceWorker' in navigator) {
     logo.addEventListener('click', function (e) {
       clicks++;
       lanzarEmojis(e.clientX, e.clientY);
-      mostrarToast(FRASES[Math.floor(Math.random() * FRASES.length)]);
+      mostrarToast(FRASES_MES[Math.floor(Math.random() * FRASES_MES.length)]);
       clearTimeout(clickTimer);
       clickTimer = setTimeout(function () { clicks = 0; }, 3000);
       if (clicks >= 5) {

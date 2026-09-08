@@ -116,6 +116,64 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
+function normalizarTexto(s) {
+  return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim().toUpperCase();
+}
+// Nombre chileno tipico: Nombre1 [Nombre2] Apellido1 [Apellido2]. Se usa solo
+// para cruzar con el informe NPS (esa BBDD no trae RUT, solo nombre).
+function loginKey(nombreCompleto) {
+  const partes = (nombreCompleto || '').trim().split(/\s+/).filter(Boolean);
+  const nombre = partes[0] || '';
+  const apellido = partes.length >= 3 ? partes[2] : (partes[1] || '');
+  return normalizarTexto(nombre + ' ' + apellido);
+}
+
+// Lee el NPS por tecnico que exporta el informe NPS (repo aparte) y lo
+// combina por nombre corto (si el tecnico trabajo en las dos zonas ese mes,
+// se combinan sus encuestas en un solo NPS, igual que en el Portal de Tecnicos).
+function cargarNpsPorTecnico() {
+  const npsPath = path.join(carpetaBbdd, 'nps-tecnicos.json');
+  if (!fs.existsSync(npsPath)) return {};
+  let npsData;
+  try {
+    npsData = JSON.parse(fs.readFileSync(npsPath, 'utf8'));
+  } catch (err) {
+    console.log('AVISO: no se pudo leer nps-tecnicos.json (' + err.message + ') -- se omite el NPS por tecnico.');
+    return {};
+  }
+  if (!npsData || !Array.isArray(npsData.tecnicos)) return {};
+  const porLogin = {};
+  npsData.tecnicos.forEach((t) => {
+    const key = loginKey(t.tecnico);
+    if (!porLogin[key]) porLogin[key] = [];
+    porLogin[key].push(t);
+  });
+  const resultado = {};
+  Object.entries(porLogin).forEach(([key, candidatos]) => {
+    const total = candidatos.reduce((a, c) => a + c.total, 0);
+    const p = candidatos.reduce((a, c) => a + c.P, 0);
+    const d = candidatos.reduce((a, c) => a + c.D, 0);
+    resultado[key] = total ? +(((p - d) / total) * 100).toFixed(1) : null;
+  });
+  return resultado;
+}
+
+// Lee el DATA embebido de un mes ya archivado, para comparar contra el mes
+// actual ("quien empeoro/mejoro mas"). Si no existe (primer mes) retorna null.
+function cargarDatosDeArchivo(carpetaArchivo, nombreArchivo) {
+  const p = path.join(carpetaArchivo, nombreArchivo);
+  if (!fs.existsSync(p)) return null;
+  try {
+    const html = fs.readFileSync(p, 'utf8');
+    const m = html.match(/const DATA = (\{[\s\S]*?\});\n\nfunction npsClass/);
+    if (!m) return null;
+    return JSON.parse(m[1]);
+  } catch (err) {
+    console.log('AVISO: no se pudo leer el mes anterior desde ' + nombreArchivo + ' (' + err.message + ').');
+    return null;
+  }
+}
+
 
 async function main() {
   const csvPath = encontrarCsvOrigen();
@@ -831,6 +889,30 @@ async function main() {
     url: s === periodoSlug ? 'Dashboard_Reincidencias.html' : `Dashboard_Reincidencias_${s}.html`,
   }));
 
+  const npsPorTecnico = cargarNpsPorTecnico();
+
+  // Comparacion contra el mes anterior ("quien empeoro/mejoro mas"). Se busca
+  // en la lista de archivos (ya ordenada de mas reciente a mas antiguo) el que
+  // sigue al mes actual, y se lee su DATA tal cual quedo archivado ese mes.
+  const idxActualDash = archivos.findIndex((a) => a.slug === periodoSlug);
+  const mesAnteriorInfo = idxActualDash >= 0 ? archivos[idxActualDash + 1] : null;
+  const datosMesAnterior = mesAnteriorInfo ? cargarDatosDeArchivo(carpeta, mesAnteriorInfo.url) : null;
+  const tasaAnteriorPorTecnico = {};
+  if (datosMesAnterior && Array.isArray(datosMesAnterior.tecnicos)) {
+    datosMesAnterior.tecnicos.forEach((t) => { tasaAnteriorPorTecnico[t.tecnico] = t.tasa; });
+  }
+  const variacionesTecnicos = tecnicoEntries
+    .filter((e) => e.total >= 10 && tasaAnteriorPorTecnico[e.label] != null)
+    .map((e) => {
+      const tasaActual = +(e.tasa * 100).toFixed(1);
+      const tasaAnterior = tasaAnteriorPorTecnico[e.label];
+      return { tecnico: e.label, tasaActual, tasaAnterior, delta: +(tasaActual - tasaAnterior).toFixed(1) };
+    });
+  // delta positivo = subio la tasa = empeoro (en este indicador, mas bajo es mejor).
+  const masEmpeoraron = [...variacionesTecnicos].filter((v) => v.delta > 0).sort((a, b) => b.delta - a.delta).slice(0, 5);
+  const masMejoraron = [...variacionesTecnicos].filter((v) => v.delta < 0).sort((a, b) => a.delta - b.delta).slice(0, 5);
+  if (mesAnteriorInfo) console.log('Comparando contra mes anterior:', mesAnteriorInfo.label, '(' + variacionesTecnicos.length + ' tecnicos con datos en ambos meses)');
+
   const DATA = {
     archivoOrigen: path.basename(csvPath),
     generadoEl: new Date().toLocaleString('es-CL'),
@@ -855,7 +937,11 @@ async function main() {
     tecnicos: tecnicoEntries.map((e) => ({
       tecnico: e.label, agencia: (metaTec[e.label] || {}).agencia || 'sin informacion',
       total: e.total, reincidencias: e.reincidencias, tasa: +(e.tasa * 100).toFixed(1),
+      nps: npsPorTecnico[loginKey(e.label)] ?? null,
     })),
+    labelMesAnterior: mesAnteriorInfo ? mesAnteriorInfo.label : null,
+    masEmpeoraron,
+    masMejoraron,
     highlights: { top: highlightsTop, bottom: highlightsBottom },
     conclusiones: observaciones,
   };
@@ -989,6 +1075,7 @@ async function main() {
   .tech-nps.hi{ color:var(--promotor); }
   .tech-meta{ font-size:12px; color:var(--text-dim); margin-bottom:8px; }
   .tech-quote{ font-size:12.5px; color:#4a5a6b; font-style:italic; margin-top:8px; background:var(--panel-2); border-radius:8px; padding:8px 10px; border-left:2px solid var(--border); }
+  .sin-datos{ color:var(--text-dim); font-size:13.5px; font-style:italic; }
 
   footer{ text-align:center; padding:26px; color:var(--text-dim); font-size:12px; border-top:1px solid var(--border); }
   canvas{ max-width:100%; }
@@ -1121,8 +1208,23 @@ async function main() {
     </div>
   </section>
 
+  <section id="seccionVariacion" style="display:none;">
+    <div class="section-title"><span class="num">08</span><h2>Variacion Mes a Mes</h2></div>
+    <p class="section-desc" id="variacionDesc"></p>
+    <div class="perf-grid">
+      <div>
+        <div class="perf-col-title top">🟢 Mas mejoraron</div>
+        <div id="masMejoraron"></div>
+      </div>
+      <div>
+        <div class="perf-col-title bottom">🔴 Mas empeoraron</div>
+        <div id="masEmpeoraron"></div>
+      </div>
+    </div>
+  </section>
+
   <section>
-    <div class="section-title"><span class="num">08</span><h2>Conclusiones y Recomendaciones</h2></div>
+    <div class="section-title"><span class="num">09</span><h2>Conclusiones y Recomendaciones</h2></div>
     <div class="rec-list" id="recList"></div>
   </section>
 </main>
@@ -1349,7 +1451,7 @@ let tecnicosHtml = '';
 agenciasOrden.forEach(agencia => {
   const tecsAg = DATA.tecnicos.filter(t=>t.agencia===agencia && t.total>=10).sort((a,b)=>b.tasa-a.tasa);
   if (!tecsAg.length) return;
-  let rowsTec = '<tr><th>#</th><th>Tecnico</th><th>Tasa</th><th>Reparaciones</th><th>Reincidencias</th></tr>';
+  let rowsTec = '<tr><th>#</th><th>Tecnico</th><th>Tasa</th><th>Reparaciones</th><th>Reincidencias</th><th>NPS</th></tr>';
   tecsAg.forEach((t,i)=>{
     rowsTec += \`<tr>
       <td>\${i+1}</td>
@@ -1357,6 +1459,7 @@ agenciasOrden.forEach(agencia => {
       <td><span class="badge \${npsClass(t.tasa,DATA.meta)}">\${t.tasa}%</span></td>
       <td>\${t.total}</td>
       <td>\${t.reincidencias}</td>
+      <td>\${t.nps != null ? t.nps+'%' : '—'}</td>
     </tr>\`;
   });
   tecnicosHtml += \`<div class="panel" style="margin-bottom:16px;">
@@ -1377,6 +1480,22 @@ function techCard(t, kind){
 }
 document.getElementById('topTecnicos').innerHTML = DATA.highlights.top.map(t=>techCard(t,'top')).join('');
 document.getElementById('bottomTecnicos').innerHTML = DATA.highlights.bottom.map(t=>techCard(t,'bottom')).join('');
+
+// ---- Variacion mes a mes ----
+function variacionCard(v, kind){
+  const cls = kind==='mejoro' ? 'hi' : 'lo';
+  const signo = v.delta > 0 ? '+' : '';
+  return \`<div class="tech-card \${kind==='mejoro'?'top-card':'bottom-card'}">
+    <div class="tech-head"><span class="tech-name">\${titleCase(v.tecnico)}</span><span class="tech-nps \${cls}">\${signo}\${v.delta}pts</span></div>
+    <div class="tech-meta">\${v.tasaAnterior}% → \${v.tasaActual}%</div>
+  </div>\`;
+}
+if ((DATA.masMejoraron && DATA.masMejoraron.length) || (DATA.masEmpeoraron && DATA.masEmpeoraron.length)) {
+  document.getElementById('seccionVariacion').style.display = '';
+  document.getElementById('variacionDesc').textContent = 'Comparado contra ' + DATA.labelMesAnterior + ' (tecnicos con minimo 10 reparaciones en ambos meses). En este indicador, mas bajo es mejor.';
+  document.getElementById('masMejoraron').innerHTML = (DATA.masMejoraron||[]).map(v=>variacionCard(v,'mejoro')).join('') || '<p class="sin-datos">Nadie bajo su tasa este mes.</p>';
+  document.getElementById('masEmpeoraron').innerHTML = (DATA.masEmpeoraron||[]).map(v=>variacionCard(v,'empeoro')).join('') || '<p class="sin-datos">Nadie subio su tasa este mes.</p>';
+}
 
 // ---- Conclusiones ----
 document.getElementById('recList').innerHTML = DATA.conclusiones.map((c,i)=>\`
@@ -1417,6 +1536,23 @@ if ('serviceWorker' in navigator) {
     'Cada reto es una oportunidad de aprender 📚',
     'Tu actitud hace la diferencia 🔥',
   ];
+  // Frases especiales por fecha (automatico segun el mes del visitante):
+  // Fiestas Patrias en septiembre, Navidad/Ano Nuevo en diciembre.
+  var FRASES_ESPECIALES = {
+    9: [
+      '¡Viva Chile! Que las Fiestas Patrias te recarguen de energia 🇨🇱🎉',
+      'Dieciocho de septiembre: a celebrar como se merece, con toda la energia del pais 🇨🇱🥟',
+      'Como buen chileno, sigue poniendole empanada y power a cada dia 🇨🇱💪',
+      'Fiestas Patrias: buen momento para parar, celebrar, y volver con toda la energia 🇨🇱',
+    ],
+    12: [
+      '🎄 Feliz Navidad, que este mes cierre con broche de oro',
+      '¡Que el espiritu navideno te acompane en cada visita! 🎅',
+      'Un fin de ano de excelentes resultados para ti y tu familia 🎆',
+      '🎁 Diciembre es para cerrar el ano arriba, sigue asi',
+    ],
+  };
+  var FRASES_MES = FRASES.concat(FRASES_ESPECIALES[new Date().getMonth() + 1] || []);
   var clicks = 0, clickTimer = null;
 
   function mostrarToast(texto) {
@@ -1488,7 +1624,7 @@ if ('serviceWorker' in navigator) {
         for (var i = 0; i < restantes.length; i++) restantes[i].remove();
         overlay.innerHTML = '<button class="eg-cerrar">✕</button>'
           + '<div class="easter-game-final">🎉 Puntaje final: ' + score + ' estrellas<br>'
-          + '<span style="font-size:14px;font-weight:400;">' + FRASES[Math.floor(Math.random() * FRASES.length)] + '</span><br>'
+          + '<span style="font-size:14px;font-weight:400;">' + FRASES_MES[Math.floor(Math.random() * FRASES_MES.length)] + '</span><br>'
           + '<button id="egCerrarFinal">Cerrar</button></div>';
         overlay.querySelector('#egCerrarFinal').addEventListener('click', function () { overlay.remove(); });
         overlay.querySelector('.eg-cerrar').addEventListener('click', function () { overlay.remove(); });
@@ -1507,7 +1643,7 @@ if ('serviceWorker' in navigator) {
     logo.addEventListener('click', function (e) {
       clicks++;
       lanzarEmojis(e.clientX, e.clientY);
-      mostrarToast(FRASES[Math.floor(Math.random() * FRASES.length)]);
+      mostrarToast(FRASES_MES[Math.floor(Math.random() * FRASES_MES.length)]);
       clearTimeout(clickTimer);
       clickTimer = setTimeout(function () { clicks = 0; }, 3000);
       if (clicks >= 5) {

@@ -127,6 +127,7 @@
   .tech-nps.hi{ color:var(--promotor); }
   .tech-meta{ font-size:12px; color:var(--text-dim); margin-bottom:8px; }
   .tech-quote{ font-size:12.5px; color:#4a5a6b; font-style:italic; margin-top:8px; background:var(--panel-2); border-radius:8px; padding:8px 10px; border-left:2px solid var(--border); }
+  .sin-datos{ color:var(--text-dim); font-size:13.5px; font-style:italic; }
 
   footer{ text-align:center; padding:26px; color:var(--text-dim); font-size:12px; border-top:1px solid var(--border); }
   canvas{ max-width:100%; }
@@ -259,8 +260,23 @@
     </div>
   </section>
 
+  <section id="seccionVariacion" style="display:none;">
+    <div class="section-title"><span class="num">08</span><h2>Variacion Mes a Mes</h2></div>
+    <p class="section-desc" id="variacionDesc"></p>
+    <div class="perf-grid">
+      <div>
+        <div class="perf-col-title top">🟢 Mas mejoraron</div>
+        <div id="masMejoraron"></div>
+      </div>
+      <div>
+        <div class="perf-col-title bottom">🔴 Mas empeoraron</div>
+        <div id="masEmpeoraron"></div>
+      </div>
+    </div>
+  </section>
+
   <section>
-    <div class="section-title"><span class="num">08</span><h2>Conclusiones y Recomendaciones</h2></div>
+    <div class="section-title"><span class="num">09</span><h2>Conclusiones y Recomendaciones</h2></div>
     <div class="rec-list" id="recList"></div>
   </section>
 </main>
@@ -268,7 +284,7 @@
 <footer id="footerText"></footer>
 
 <script>
-const DATA = {"archivoOrigen":"p23-averias-reiteradas_1_COBRA_2026-09.csv","generadoEl":"08-09-2026, 12:32:53 p. m.","periodo":"2026-07-20 al 2026-08-31","periodoSlug":"2026-09","archivos":[{"slug":"2026-09","label":"Septiembre 2026","url":"Dashboard_Reincidencias.html"},{"slug":"2026-08","label":"Agosto 2026","url":"Dashboard_Reincidencias_2026-08.html"}],"agencias_lista":"PUNTA ARENAS y COYHAIQUE","meta":4,"totalReparaciones":936,"totalReincidencias":38,"tasaGlobal":4.1,"diasPromedio":8.5,"diasMediana":6,"pctDentro7":63.2,"mismoPct":57.1,"mismoTotal":28,"agencias":[{"agencia":"COYHAIQUE","total":80,"reincidencias":4,"tasa":5},{"agencia":"PUNTA ARENAS","total":856,"reincidencias":34,"tasa":4}],"causas":[{"causa":"BA-PROBLEMA NAVEGACION","total":1,"reincidencias":1,"tasa":100},{"causa":"sin informacion","total":3,"reincidencias":1,"tasa":33.3},{"causa":"BA-PROBLEMA CONEXION","total":274,"reincidencias":14,"tasa":5.1},{"causa":"FO SIN POTENCIA","total":422,"reincidencias":17,"tasa":4},{"causa":"BA-PROBLEMA MODEM","total":223,"reincidencias":5,"tasa":2.2},{"causa":"FALLA MASIVA","total":1,"reincidencias":0,"tasa":0},{"causa":"IPTV - PROBLEMA DE IMAGEN Y SENAL","total":2,"reincidencias":0,"tasa":0},{"causa":"IPTV - CONFIGURACION","total":2,"reincidencias":0,"tasa":0},{"causa":"PROBLEMA REPETIDOR","total":1,"reincidencias":0,"tasa":0},{"causa":"IPTV - PROBLEMAS EQUIPOS","total":4,"reincidencias":0,"tasa":0},{"causa":"TOIP N-LINEAS","total":1,"reincidencias":0,"tasa":0},{"causa":"IPTV - PROBLEMA DE CONEXION","total":1,"reincidencias":0,"tasa":0},{"causa":"REGULARIZACION DE DIRECCION","total":1,"reincidencias":0,"tasa":0}],"subcausas":[{"subcausa":"BA-POTENCIA BAJA - FO - 90057","total":11,"reincidencias":1,"tasa":9.1},{"subcausa":"BA-CABLE INT/ ROSETA OPTICA - FO -97918","total":65,"reincidencias":5,"tasa":7.7},{"subcausa":"BA-CABLE INT/ ROSETA OPTICA - FO -90057","total":243,"reincidencias":13,"tasa":5.3},{"subcausa":"DESPACHO TEC REQUERIDO BOT WHATSAPP - FO - 97918","total":95,"reincidencias":4,"tasa":4.2},{"subcausa":"BA-NO NAVEGA - FO - 97918","total":225,"reincidencias":8,"tasa":3.6},{"subcausa":"BA-MODEM DANADO - FO - 90057","total":223,"reincidencias":5,"tasa":2.2},{"subcausa":"BA-INTERMITENCIA - FO - 90057","total":10,"reincidencias":0,"tasa":0},{"subcausa":"DESPACHO TEC REQUERIDO MI MOVISTAR - FO - 97918","total":36,"reincidencias":0,"tasa":0}],"diasBuckets":[{"label":"0-1 dias","count":5,"pct":13.2},{"label":"2-3 dias","count":8,"pct":21.1},{"label":"4-7 dias","count":11,"pct":28.9},{"label":"8-15 dias","count":6,"pct":15.8},{"label":"16-30 dias","count":8,"pct":21.1}],"mismoPorCausa":[{"causa":"BA-PROBLEMA CONEXION","total":13,"mismo":8,"tasa":61.5},{"causa":"FO SIN POTENCIA","total":10,"mismo":4,"tasa":40}],"tecnicos":[{"tecnico":"LUIS EDUARDO CISTERNAS OYARZO","agencia":"COYHAIQUE","total":39,"reincidencias":4,"tasa":10.3},{"tecnico":"LUCAS RENATO SERON VELASQUEZ","agencia":"PUNTA ARENAS","total":40,"reincidencias":4,"tasa":10},{"tecnico":"MARCOS ALEJANDRO AGUILAR ROA","agencia":"PUNTA ARENAS","total":42,"reincidencias":3,"tasa":7.1},{"tecnico":"ROBERTO ESTEBAN DIAZ GARRIDO","agencia":"PUNTA ARENAS","total":46,"reincidencias":3,"tasa":6.5},{"tecnico":"RODRIGO EDUARDO GODOY CARCAMO","agencia":"PUNTA ARENAS","total":50,"reincidencias":3,"tasa":6},{"tecnico":"JOAN JOEL HERNANDEZ AMAYA","agencia":"PUNTA ARENAS","total":34,"reincidencias":2,"tasa":5.9},{"tecnico":"FELIPE ANTONIO RIOS CIFUENTES","agencia":"PUNTA ARENAS","total":36,"reincidencias":2,"tasa":5.6},{"tecnico":"LUIS ALFONSO BARRIENTOS MUNOZ","agencia":"PUNTA ARENAS","total":37,"reincidencias":2,"tasa":5.4},{"tecnico":"MIGUEL ALEJANDRO ALVARADO VIVAR","agencia":"PUNTA ARENAS","total":43,"reincidencias":2,"tasa":4.7},{"tecnico":"GONZALO RODRIGO CARCAMO MALDONADO","agencia":"PUNTA ARENAS","total":44,"reincidencias":2,"tasa":4.5},{"tecnico":"LUIS ALFONSO TORRES MILLAQUEN","agencia":"PUNTA ARENAS","total":49,"reincidencias":2,"tasa":4.1},{"tecnico":"GABRIEL LEONIDAS RAMIREZ IBARRA","agencia":"PUNTA ARENAS","total":26,"reincidencias":1,"tasa":3.8},{"tecnico":"RONIEL JESUS DIAZ SUAREZ","agencia":"PUNTA ARENAS","total":30,"reincidencias":1,"tasa":3.3},{"tecnico":"EDUARDO ANDRES WITTO MANSILLA","agencia":"PUNTA ARENAS","total":60,"reincidencias":2,"tasa":3.3},{"tecnico":"JUAN CARLOS ULLOA MORAGA","agencia":"PUNTA ARENAS","total":37,"reincidencias":1,"tasa":2.7},{"tecnico":"JOSE ALEXIS BARRIA ALMONACID","agencia":"PUNTA ARENAS","total":80,"reincidencias":2,"tasa":2.5},{"tecnico":"RENE EDUARDO MAYORGA LEUQUEN","agencia":"PUNTA ARENAS","total":53,"reincidencias":1,"tasa":1.9},{"tecnico":"VICTOR HUGO BARRIA ALMONACID","agencia":"PUNTA ARENAS","total":62,"reincidencias":1,"tasa":1.6},{"tecnico":"CARLOS ALFONSO PINTO AGUILAR","agencia":"PUNTA ARENAS","total":33,"reincidencias":0,"tasa":0},{"tecnico":"AXEL LEONARDO ALFARO ALVAREZ","agencia":"COYHAIQUE","total":21,"reincidencias":0,"tasa":0},{"tecnico":"CARLOS ROBERTO SALDIVIA HERNANDEZ","agencia":"PUNTA ARENAS","total":21,"reincidencias":0,"tasa":0},{"tecnico":"JULIO LOPEZ CORTES","agencia":"COYHAIQUE","total":20,"reincidencias":0,"tasa":0},{"tecnico":"EGON RODRIGO VILLARROEL ZUNIGA","agencia":"PUNTA ARENAS","total":30,"reincidencias":0,"tasa":0},{"tecnico":"MARCELO FERNANDO CARDENAS LLANCALAHUEN","agencia":"PUNTA ARENAS","total":3,"reincidencias":0,"tasa":0}],"highlights":{"top":[{"tecnico":"CARLOS ALFONSO PINTO AGUILAR","tasa":0,"total":33,"reincidencias":0,"nota":"Sin reincidencias en 33 reparaciones"},{"tecnico":"AXEL LEONARDO ALFARO ALVAREZ","tasa":0,"total":21,"reincidencias":0,"nota":"Sin reincidencias en 21 reparaciones"},{"tecnico":"CARLOS ROBERTO SALDIVIA HERNANDEZ","tasa":0,"total":21,"reincidencias":0,"nota":"Sin reincidencias en 21 reparaciones"},{"tecnico":"JULIO LOPEZ CORTES","tasa":0,"total":20,"reincidencias":0,"nota":"Sin reincidencias en 20 reparaciones"}],"bottom":[{"tecnico":"LUIS EDUARDO CISTERNAS OYARZO","tasa":10.3,"total":39,"reincidencias":4,"nota":"Su reincidencia mas frecuente: BA-PROBLEMA MODEM (2 casos)"},{"tecnico":"LUCAS RENATO SERON VELASQUEZ","tasa":10,"total":40,"reincidencias":4,"nota":"Su reincidencia mas frecuente: BA-PROBLEMA MODEM (2 casos)"},{"tecnico":"MARCOS ALEJANDRO AGUILAR ROA","tasa":7.1,"total":42,"reincidencias":3,"nota":"Su reincidencia mas frecuente: FO SIN POTENCIA (2 casos)"},{"tecnico":"ROBERTO ESTEBAN DIAZ GARRIDO","tasa":6.5,"total":46,"reincidencias":3,"nota":"Su reincidencia mas frecuente: BA-PROBLEMA CONEXION (3 casos)"}]},"conclusiones":["Tasa global de reincidencia: <strong>4.1%</strong> — <span class=\"bad-text\">NO CUMPLE</span> la meta del 4% (38 de 936 reparaciones reincidieron dentro de 30 dias).","La agencia con mayor tasa es <strong>COYHAIQUE</strong> con 5.0% (4/80).","La causa que mas reincide es <strong>BA-PROBLEMA NAVEGACION</strong> con 100.0%.","La subcausa mas critica (con al menos 5 casos) es <strong>BA-POTENCIA BAJA - FO - 90057</strong> con 9.1%.","El tecnico con mayor tasa de reincidencia (minimo 10 reparaciones) es <strong>LUIS EDUARDO CISTERNAS OYARZO</strong> con 10.3% (4/39).","El mejor desempeno (minimo 10 reparaciones) es de <strong>CARLOS ALFONSO PINTO AGUILAR</strong> con 0.0%.","En promedio, una reincidencia ocurre a los <strong>8.5 dias</strong>; el 63% ocurre dentro de la primera semana.","<strong>LUCAS RENATO SERON VELASQUEZ</strong> tiene el promedio mas bajo de dias hasta reincidir (5.0 dias en 4 casos) — posible senal de reparaciones que no resuelven el problema de fondo.","De los casos con dato completo, el <strong>57%</strong> de las reincidencias fueron re-atendidas por el mismo tecnico que hizo la reparacion original.","En <strong>BA-PROBLEMA CONEXION</strong>, el 62% de las reincidencias las resuelve el mismo tecnico que hizo la reparacion original."]};
+const DATA = {"archivoOrigen":"p23-averias-reiteradas_1_COBRA_2026-09.csv","generadoEl":"08-09-2026, 12:56:54 p. m.","periodo":"2026-07-20 al 2026-08-31","periodoSlug":"2026-09","archivos":[{"slug":"2026-09","label":"Septiembre 2026","url":"Dashboard_Reincidencias.html"},{"slug":"2026-08","label":"Agosto 2026","url":"Dashboard_Reincidencias_2026-08.html"}],"agencias_lista":"PUNTA ARENAS y COYHAIQUE","meta":4,"totalReparaciones":936,"totalReincidencias":38,"tasaGlobal":4.1,"diasPromedio":8.5,"diasMediana":6,"pctDentro7":63.2,"mismoPct":57.1,"mismoTotal":28,"agencias":[{"agencia":"COYHAIQUE","total":80,"reincidencias":4,"tasa":5},{"agencia":"PUNTA ARENAS","total":856,"reincidencias":34,"tasa":4}],"causas":[{"causa":"BA-PROBLEMA NAVEGACION","total":1,"reincidencias":1,"tasa":100},{"causa":"sin informacion","total":3,"reincidencias":1,"tasa":33.3},{"causa":"BA-PROBLEMA CONEXION","total":274,"reincidencias":14,"tasa":5.1},{"causa":"FO SIN POTENCIA","total":422,"reincidencias":17,"tasa":4},{"causa":"BA-PROBLEMA MODEM","total":223,"reincidencias":5,"tasa":2.2},{"causa":"FALLA MASIVA","total":1,"reincidencias":0,"tasa":0},{"causa":"IPTV - PROBLEMA DE IMAGEN Y SENAL","total":2,"reincidencias":0,"tasa":0},{"causa":"IPTV - CONFIGURACION","total":2,"reincidencias":0,"tasa":0},{"causa":"PROBLEMA REPETIDOR","total":1,"reincidencias":0,"tasa":0},{"causa":"IPTV - PROBLEMAS EQUIPOS","total":4,"reincidencias":0,"tasa":0},{"causa":"TOIP N-LINEAS","total":1,"reincidencias":0,"tasa":0},{"causa":"IPTV - PROBLEMA DE CONEXION","total":1,"reincidencias":0,"tasa":0},{"causa":"REGULARIZACION DE DIRECCION","total":1,"reincidencias":0,"tasa":0}],"subcausas":[{"subcausa":"BA-POTENCIA BAJA - FO - 90057","total":11,"reincidencias":1,"tasa":9.1},{"subcausa":"BA-CABLE INT/ ROSETA OPTICA - FO -97918","total":65,"reincidencias":5,"tasa":7.7},{"subcausa":"BA-CABLE INT/ ROSETA OPTICA - FO -90057","total":243,"reincidencias":13,"tasa":5.3},{"subcausa":"DESPACHO TEC REQUERIDO BOT WHATSAPP - FO - 97918","total":95,"reincidencias":4,"tasa":4.2},{"subcausa":"BA-NO NAVEGA - FO - 97918","total":225,"reincidencias":8,"tasa":3.6},{"subcausa":"BA-MODEM DANADO - FO - 90057","total":223,"reincidencias":5,"tasa":2.2},{"subcausa":"BA-INTERMITENCIA - FO - 90057","total":10,"reincidencias":0,"tasa":0},{"subcausa":"DESPACHO TEC REQUERIDO MI MOVISTAR - FO - 97918","total":36,"reincidencias":0,"tasa":0}],"diasBuckets":[{"label":"0-1 dias","count":5,"pct":13.2},{"label":"2-3 dias","count":8,"pct":21.1},{"label":"4-7 dias","count":11,"pct":28.9},{"label":"8-15 dias","count":6,"pct":15.8},{"label":"16-30 dias","count":8,"pct":21.1}],"mismoPorCausa":[{"causa":"BA-PROBLEMA CONEXION","total":13,"mismo":8,"tasa":61.5},{"causa":"FO SIN POTENCIA","total":10,"mismo":4,"tasa":40}],"tecnicos":[{"tecnico":"LUIS EDUARDO CISTERNAS OYARZO","agencia":"COYHAIQUE","total":39,"reincidencias":4,"tasa":10.3,"nps":100},{"tecnico":"LUCAS RENATO SERON VELASQUEZ","agencia":"PUNTA ARENAS","total":40,"reincidencias":4,"tasa":10,"nps":null},{"tecnico":"MARCOS ALEJANDRO AGUILAR ROA","agencia":"PUNTA ARENAS","total":42,"reincidencias":3,"tasa":7.1,"nps":100},{"tecnico":"ROBERTO ESTEBAN DIAZ GARRIDO","agencia":"PUNTA ARENAS","total":46,"reincidencias":3,"tasa":6.5,"nps":100},{"tecnico":"RODRIGO EDUARDO GODOY CARCAMO","agencia":"PUNTA ARENAS","total":50,"reincidencias":3,"tasa":6,"nps":null},{"tecnico":"JOAN JOEL HERNANDEZ AMAYA","agencia":"PUNTA ARENAS","total":34,"reincidencias":2,"tasa":5.9,"nps":null},{"tecnico":"FELIPE ANTONIO RIOS CIFUENTES","agencia":"PUNTA ARENAS","total":36,"reincidencias":2,"tasa":5.6,"nps":null},{"tecnico":"LUIS ALFONSO BARRIENTOS MUNOZ","agencia":"PUNTA ARENAS","total":37,"reincidencias":2,"tasa":5.4,"nps":63.6},{"tecnico":"MIGUEL ALEJANDRO ALVARADO VIVAR","agencia":"PUNTA ARENAS","total":43,"reincidencias":2,"tasa":4.7,"nps":80},{"tecnico":"GONZALO RODRIGO CARCAMO MALDONADO","agencia":"PUNTA ARENAS","total":44,"reincidencias":2,"tasa":4.5,"nps":40},{"tecnico":"LUIS ALFONSO TORRES MILLAQUEN","agencia":"PUNTA ARENAS","total":49,"reincidencias":2,"tasa":4.1,"nps":100},{"tecnico":"GABRIEL LEONIDAS RAMIREZ IBARRA","agencia":"PUNTA ARENAS","total":26,"reincidencias":1,"tasa":3.8,"nps":null},{"tecnico":"RONIEL JESUS DIAZ SUAREZ","agencia":"PUNTA ARENAS","total":30,"reincidencias":1,"tasa":3.3,"nps":null},{"tecnico":"EDUARDO ANDRES WITTO MANSILLA","agencia":"PUNTA ARENAS","total":60,"reincidencias":2,"tasa":3.3,"nps":37.5},{"tecnico":"JUAN CARLOS ULLOA MORAGA","agencia":"PUNTA ARENAS","total":37,"reincidencias":1,"tasa":2.7,"nps":100},{"tecnico":"JOSE ALEXIS BARRIA ALMONACID","agencia":"PUNTA ARENAS","total":80,"reincidencias":2,"tasa":2.5,"nps":100},{"tecnico":"RENE EDUARDO MAYORGA LEUQUEN","agencia":"PUNTA ARENAS","total":53,"reincidencias":1,"tasa":1.9,"nps":null},{"tecnico":"VICTOR HUGO BARRIA ALMONACID","agencia":"PUNTA ARENAS","total":62,"reincidencias":1,"tasa":1.6,"nps":100},{"tecnico":"CARLOS ALFONSO PINTO AGUILAR","agencia":"PUNTA ARENAS","total":33,"reincidencias":0,"tasa":0,"nps":null},{"tecnico":"AXEL LEONARDO ALFARO ALVAREZ","agencia":"COYHAIQUE","total":21,"reincidencias":0,"tasa":0,"nps":62.5},{"tecnico":"CARLOS ROBERTO SALDIVIA HERNANDEZ","agencia":"PUNTA ARENAS","total":21,"reincidencias":0,"tasa":0,"nps":null},{"tecnico":"JULIO LOPEZ CORTES","agencia":"COYHAIQUE","total":20,"reincidencias":0,"tasa":0,"nps":83.3},{"tecnico":"EGON RODRIGO VILLARROEL ZUNIGA","agencia":"PUNTA ARENAS","total":30,"reincidencias":0,"tasa":0,"nps":null},{"tecnico":"MARCELO FERNANDO CARDENAS LLANCALAHUEN","agencia":"PUNTA ARENAS","total":3,"reincidencias":0,"tasa":0,"nps":null}],"labelMesAnterior":"Agosto 2026","masEmpeoraron":[{"tecnico":"LUIS ALFONSO TORRES MILLAQUEN","tasaActual":4.1,"tasaAnterior":1.9,"delta":2.2},{"tecnico":"GABRIEL LEONIDAS RAMIREZ IBARRA","tasaActual":3.8,"tasaAnterior":2.1,"delta":1.7},{"tecnico":"FELIPE ANTONIO RIOS CIFUENTES","tasaActual":5.6,"tasaAnterior":4.2,"delta":1.4},{"tecnico":"JOAN JOEL HERNANDEZ AMAYA","tasaActual":5.9,"tasaAnterior":5.1,"delta":0.8},{"tecnico":"RONIEL JESUS DIAZ SUAREZ","tasaActual":3.3,"tasaAnterior":2.9,"delta":0.4}],"masMejoraron":[{"tecnico":"JULIO LOPEZ CORTES","tasaActual":0,"tasaAnterior":13,"delta":-13},{"tecnico":"CARLOS ALFONSO PINTO AGUILAR","tasaActual":0,"tasaAnterior":12.9,"delta":-12.9},{"tecnico":"VICTOR HUGO BARRIA ALMONACID","tasaActual":1.6,"tasaAnterior":11.9,"delta":-10.3},{"tecnico":"MARCOS ALEJANDRO AGUILAR ROA","tasaActual":7.1,"tasaAnterior":16.7,"delta":-9.6},{"tecnico":"CARLOS ROBERTO SALDIVIA HERNANDEZ","tasaActual":0,"tasaAnterior":9.1,"delta":-9.1}],"highlights":{"top":[{"tecnico":"CARLOS ALFONSO PINTO AGUILAR","tasa":0,"total":33,"reincidencias":0,"nota":"Sin reincidencias en 33 reparaciones"},{"tecnico":"AXEL LEONARDO ALFARO ALVAREZ","tasa":0,"total":21,"reincidencias":0,"nota":"Sin reincidencias en 21 reparaciones"},{"tecnico":"CARLOS ROBERTO SALDIVIA HERNANDEZ","tasa":0,"total":21,"reincidencias":0,"nota":"Sin reincidencias en 21 reparaciones"},{"tecnico":"JULIO LOPEZ CORTES","tasa":0,"total":20,"reincidencias":0,"nota":"Sin reincidencias en 20 reparaciones"}],"bottom":[{"tecnico":"LUIS EDUARDO CISTERNAS OYARZO","tasa":10.3,"total":39,"reincidencias":4,"nota":"Su reincidencia mas frecuente: BA-PROBLEMA MODEM (2 casos)"},{"tecnico":"LUCAS RENATO SERON VELASQUEZ","tasa":10,"total":40,"reincidencias":4,"nota":"Su reincidencia mas frecuente: BA-PROBLEMA MODEM (2 casos)"},{"tecnico":"MARCOS ALEJANDRO AGUILAR ROA","tasa":7.1,"total":42,"reincidencias":3,"nota":"Su reincidencia mas frecuente: FO SIN POTENCIA (2 casos)"},{"tecnico":"ROBERTO ESTEBAN DIAZ GARRIDO","tasa":6.5,"total":46,"reincidencias":3,"nota":"Su reincidencia mas frecuente: BA-PROBLEMA CONEXION (3 casos)"}]},"conclusiones":["Tasa global de reincidencia: <strong>4.1%</strong> — <span class=\"bad-text\">NO CUMPLE</span> la meta del 4% (38 de 936 reparaciones reincidieron dentro de 30 dias).","La agencia con mayor tasa es <strong>COYHAIQUE</strong> con 5.0% (4/80).","La causa que mas reincide es <strong>BA-PROBLEMA NAVEGACION</strong> con 100.0%.","La subcausa mas critica (con al menos 5 casos) es <strong>BA-POTENCIA BAJA - FO - 90057</strong> con 9.1%.","El tecnico con mayor tasa de reincidencia (minimo 10 reparaciones) es <strong>LUIS EDUARDO CISTERNAS OYARZO</strong> con 10.3% (4/39).","El mejor desempeno (minimo 10 reparaciones) es de <strong>CARLOS ALFONSO PINTO AGUILAR</strong> con 0.0%.","En promedio, una reincidencia ocurre a los <strong>8.5 dias</strong>; el 63% ocurre dentro de la primera semana.","<strong>LUCAS RENATO SERON VELASQUEZ</strong> tiene el promedio mas bajo de dias hasta reincidir (5.0 dias en 4 casos) — posible senal de reparaciones que no resuelven el problema de fondo.","De los casos con dato completo, el <strong>57%</strong> de las reincidencias fueron re-atendidas por el mismo tecnico que hizo la reparacion original.","En <strong>BA-PROBLEMA CONEXION</strong>, el 62% de las reincidencias las resuelve el mismo tecnico que hizo la reparacion original."]};
 
 function npsClass(v, meta){ return v<=meta ? 'hi' : (v<=meta*2 ? 'mid' : 'lo'); }
 function titleCase(s){ return s.split(' ').map(w=>w?w[0]+w.slice(1).toLowerCase():w).join(' '); }
@@ -487,7 +503,7 @@ let tecnicosHtml = '';
 agenciasOrden.forEach(agencia => {
   const tecsAg = DATA.tecnicos.filter(t=>t.agencia===agencia && t.total>=10).sort((a,b)=>b.tasa-a.tasa);
   if (!tecsAg.length) return;
-  let rowsTec = '<tr><th>#</th><th>Tecnico</th><th>Tasa</th><th>Reparaciones</th><th>Reincidencias</th></tr>';
+  let rowsTec = '<tr><th>#</th><th>Tecnico</th><th>Tasa</th><th>Reparaciones</th><th>Reincidencias</th><th>NPS</th></tr>';
   tecsAg.forEach((t,i)=>{
     rowsTec += `<tr>
       <td>${i+1}</td>
@@ -495,6 +511,7 @@ agenciasOrden.forEach(agencia => {
       <td><span class="badge ${npsClass(t.tasa,DATA.meta)}">${t.tasa}%</span></td>
       <td>${t.total}</td>
       <td>${t.reincidencias}</td>
+      <td>${t.nps != null ? t.nps+'%' : '—'}</td>
     </tr>`;
   });
   tecnicosHtml += `<div class="panel" style="margin-bottom:16px;">
@@ -515,6 +532,22 @@ function techCard(t, kind){
 }
 document.getElementById('topTecnicos').innerHTML = DATA.highlights.top.map(t=>techCard(t,'top')).join('');
 document.getElementById('bottomTecnicos').innerHTML = DATA.highlights.bottom.map(t=>techCard(t,'bottom')).join('');
+
+// ---- Variacion mes a mes ----
+function variacionCard(v, kind){
+  const cls = kind==='mejoro' ? 'hi' : 'lo';
+  const signo = v.delta > 0 ? '+' : '';
+  return `<div class="tech-card ${kind==='mejoro'?'top-card':'bottom-card'}">
+    <div class="tech-head"><span class="tech-name">${titleCase(v.tecnico)}</span><span class="tech-nps ${cls}">${signo}${v.delta}pts</span></div>
+    <div class="tech-meta">${v.tasaAnterior}% → ${v.tasaActual}%</div>
+  </div>`;
+}
+if ((DATA.masMejoraron && DATA.masMejoraron.length) || (DATA.masEmpeoraron && DATA.masEmpeoraron.length)) {
+  document.getElementById('seccionVariacion').style.display = '';
+  document.getElementById('variacionDesc').textContent = 'Comparado contra ' + DATA.labelMesAnterior + ' (tecnicos con minimo 10 reparaciones en ambos meses). En este indicador, mas bajo es mejor.';
+  document.getElementById('masMejoraron').innerHTML = (DATA.masMejoraron||[]).map(v=>variacionCard(v,'mejoro')).join('') || '<p class="sin-datos">Nadie bajo su tasa este mes.</p>';
+  document.getElementById('masEmpeoraron').innerHTML = (DATA.masEmpeoraron||[]).map(v=>variacionCard(v,'empeoro')).join('') || '<p class="sin-datos">Nadie subio su tasa este mes.</p>';
+}
 
 // ---- Conclusiones ----
 document.getElementById('recList').innerHTML = DATA.conclusiones.map((c,i)=>`
@@ -555,6 +588,23 @@ if ('serviceWorker' in navigator) {
     'Cada reto es una oportunidad de aprender 📚',
     'Tu actitud hace la diferencia 🔥',
   ];
+  // Frases especiales por fecha (automatico segun el mes del visitante):
+  // Fiestas Patrias en septiembre, Navidad/Ano Nuevo en diciembre.
+  var FRASES_ESPECIALES = {
+    9: [
+      '¡Viva Chile! Que las Fiestas Patrias te recarguen de energia 🇨🇱🎉',
+      'Dieciocho de septiembre: a celebrar como se merece, con toda la energia del pais 🇨🇱🥟',
+      'Como buen chileno, sigue poniendole empanada y power a cada dia 🇨🇱💪',
+      'Fiestas Patrias: buen momento para parar, celebrar, y volver con toda la energia 🇨🇱',
+    ],
+    12: [
+      '🎄 Feliz Navidad, que este mes cierre con broche de oro',
+      '¡Que el espiritu navideno te acompane en cada visita! 🎅',
+      'Un fin de ano de excelentes resultados para ti y tu familia 🎆',
+      '🎁 Diciembre es para cerrar el ano arriba, sigue asi',
+    ],
+  };
+  var FRASES_MES = FRASES.concat(FRASES_ESPECIALES[new Date().getMonth() + 1] || []);
   var clicks = 0, clickTimer = null;
 
   function mostrarToast(texto) {
@@ -626,7 +676,7 @@ if ('serviceWorker' in navigator) {
         for (var i = 0; i < restantes.length; i++) restantes[i].remove();
         overlay.innerHTML = '<button class="eg-cerrar">✕</button>'
           + '<div class="easter-game-final">🎉 Puntaje final: ' + score + ' estrellas<br>'
-          + '<span style="font-size:14px;font-weight:400;">' + FRASES[Math.floor(Math.random() * FRASES.length)] + '</span><br>'
+          + '<span style="font-size:14px;font-weight:400;">' + FRASES_MES[Math.floor(Math.random() * FRASES_MES.length)] + '</span><br>'
           + '<button id="egCerrarFinal">Cerrar</button></div>';
         overlay.querySelector('#egCerrarFinal').addEventListener('click', function () { overlay.remove(); });
         overlay.querySelector('.eg-cerrar').addEventListener('click', function () { overlay.remove(); });
@@ -645,7 +695,7 @@ if ('serviceWorker' in navigator) {
     logo.addEventListener('click', function (e) {
       clicks++;
       lanzarEmojis(e.clientX, e.clientY);
-      mostrarToast(FRASES[Math.floor(Math.random() * FRASES.length)]);
+      mostrarToast(FRASES_MES[Math.floor(Math.random() * FRASES_MES.length)]);
       clearTimeout(clickTimer);
       clickTimer = setTimeout(function () { clicks = 0; }, 3000);
       if (clicks >= 5) {
