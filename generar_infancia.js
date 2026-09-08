@@ -946,6 +946,10 @@ const DATA = ${JSON.stringify(DATA)};
 
 function npsClass(v, meta){ return v<=meta ? 'hi' : (v<=meta*2 ? 'mid' : 'lo'); }
 function titleCase(s){ return s.split(' ').map(w=>w?w[0]+w.slice(1).toLowerCase():w).join(' '); }
+// Tecnicos desvinculados: se siguen mostrando en el ranking (su trabajo
+// pasado cuenta igual), solo se les agrega esta nota junto al nombre.
+const DESVINCULADOS = ['JOAN JOEL HERNANDEZ AMAYA', 'LUCAS RENATO SERON VELASQUEZ'];
+function notaDesvinculado(nombre){ return DESVINCULADOS.includes((nombre||'').toUpperCase().trim()) ? ' <span style="color:var(--text-dim);font-weight:400;font-style:italic;">(desvinculado)</span>' : ''; }
 
 document.getElementById('metaRow').innerHTML = \`
   <span>📅 Periodo analizado: <b>\${DATA.periodo}</b></span>
@@ -1111,7 +1115,7 @@ agenciasOrden.forEach(agencia => {
   if (!tecsAg.length) return;
   let rowsTec = '<tr><th>#</th><th>Tecnico</th><th>Tasa</th><th>Instalaciones</th><th>Infancia</th></tr>';
   tecsAg.forEach((t,i)=>{
-    rowsTec += \`<tr><td>\${i+1}</td><td>\${titleCase(t.tecnico)}</td><td><span class="badge \${npsClass(t.tasa,DATA.meta)}">\${t.tasa}%</span></td><td>\${t.total}</td><td>\${t.infancia}</td></tr>\`;
+    rowsTec += \`<tr><td>\${i+1}</td><td>\${titleCase(t.tecnico)}\${notaDesvinculado(t.tecnico)}</td><td><span class="badge \${npsClass(t.tasa,DATA.meta)}">\${t.tasa}%</span></td><td>\${t.total}</td><td>\${t.infancia}</td></tr>\`;
   });
   tecnicosHtml += \`<div class="panel" style="margin-bottom:16px;">
     <div style="font-size:13px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;">\${agencia} · \${tecsAg.length} tecnico\${tecsAg.length===1?'':'s'} (min. 10 instalaciones)</div>
