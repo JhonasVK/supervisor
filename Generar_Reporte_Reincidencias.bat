@@ -36,7 +36,13 @@ if errorlevel 1 (
 echo.
 echo Generando resumen para correo...
 echo.
+if exist Resumen_Diario_Correo.png del Resumen_Diario_Correo.png
 node generar_resumen_correo.js
+if exist Resumen_Diario_Correo.png (
+    echo ==^> OK: Resumen_Diario_Correo.png generado correctamente.
+) else (
+    echo ==^> AVISO: no se genero Resumen_Diario_Correo.png. Revisa los mensajes de arriba.
+)
 
 echo.
 echo Actualizando indice...
