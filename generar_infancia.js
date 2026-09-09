@@ -12,9 +12,11 @@
 const fs = require('fs');
 const path = require('path');
 const ExcelJS = require('exceljs');
+const { agregarFilaBase } = require('./base_historica');
 
 const carpeta = __dirname;
 const carpetaBbdd = path.join(carpeta, 'bbdd');
+const carpetaExcel = path.join(carpeta, 'Archivos excel');
 const META = 0.025; // 2.5%
 
 function encontrarCsvOrigen() {
@@ -157,7 +159,7 @@ function cargarDatosDeArchivo(carpetaArchivo, nombreArchivo) {
   if (!fs.existsSync(p)) return null;
   try {
     const html = fs.readFileSync(p, 'utf8');
-    const m = html.match(/const DATA = (\{[\s\S]*?\});\n\nfunction npsClass/);
+    const m = html.match(/const DATA = (\{[\s\S]*?\});\r?\n\r?\nfunction npsClass/);
     if (!m) return null;
     return JSON.parse(m[1]);
   } catch (err) {
@@ -599,9 +601,26 @@ async function main() {
   });
 
   const outName = 'Infancia_COBRA_' + timestamp() + '.xlsx';
-  const outPath = path.join(carpeta, outName);
+  const outPath = path.join(carpetaExcel, outName);
+  if (!fs.existsSync(carpetaExcel)) fs.mkdirSync(carpetaExcel, { recursive: true });
   await wb.xlsx.writeFile(outPath);
   console.log('Excel generado:', outPath);
+
+  // Fila-resumen para la base historica (una hoja por mes, ver base_historica.js).
+  try {
+    const tasaParaBase = statsGlobal.total ? statsGlobal.infancia / statsGlobal.total : 0;
+    await agregarFilaBase('infancia', {
+      fecha: new Date(),
+      total: statsGlobal.total,
+      problemas: statsGlobal.infancia,
+      tasa: +(tasaParaBase * 100).toFixed(2),
+      meta: +(META * 100).toFixed(2),
+      resultado: tasaParaBase <= META ? 'CUMPLE' : 'NO CUMPLE',
+    });
+    console.log('Fila agregada a la base historica: Archivos excel\\Base_Infancia_COBRA.xlsx');
+  } catch (err) {
+    console.log('AVISO: no se pudo agregar la fila a la base historica (' + err.message + ').');
+  }
 
   // ================== DASHBOARD HTML (mismo formato del Informe NPS) ==================
   function aEntries(statsObj) {

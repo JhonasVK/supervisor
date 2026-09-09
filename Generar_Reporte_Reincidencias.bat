@@ -34,6 +34,11 @@ if errorlevel 1 (
 )
 
 echo.
+echo Generando resumen para correo...
+echo.
+node generar_resumen_correo.js
+
+echo.
 echo Actualizando indice...
 echo.
 node generar_indice.js
