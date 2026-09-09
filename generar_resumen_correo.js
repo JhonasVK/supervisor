@@ -29,11 +29,11 @@ function titleCase(s) {
   return (s || '').split(' ').map((w) => (w ? w[0] + w.slice(1).toLowerCase() : w)).join(' ');
 }
 
-function filasVariacion(lista, tipo) {
+function filasVariacion(lista, tipo, limite = 3) {
   if (!lista || lista.length === 0) {
     return '<div class="fila"><span class="nombre" style="color:#8a97a6;font-style:italic;">Sin datos suficientes</span></div>';
   }
-  return lista.slice(0, 3).map((v) => {
+  return lista.slice(0, limite).map((v) => {
     const cls = tipo === 'mejoraron' ? 'down' : 'up';
     const signo = v.delta > 0 ? '+' : '';
     return '<div class="fila"><span class="nombre">' + titleCase(v.tecnico) + '</span><span class="num ' + cls + '">' + signo + v.delta + 'pts</span></div>';
@@ -67,72 +67,89 @@ function construirHtml(r, i, logoBase64, periodoActual, generadoEl) {
   }
   *{box-sizing:border-box;}
   body{ margin:0; font-family:'Segoe UI', Arial, sans-serif; background:#ffffff; color:var(--text); }
-  #lienzo{ width:760px; background:#ffffff; }
-  header{ background:linear-gradient(120deg,#ffffff 0%,var(--celeste-soft) 60%,#dcf1fb 100%); padding:28px 32px 22px; border-bottom:4px solid var(--celeste); }
-  .brand-row{ display:flex; align-items:center; gap:14px; margin-bottom:14px; }
-  .brand-row img{ height:38px; }
-  .brand-divider{ width:1px; height:28px; background:var(--border); }
-  .eyebrow{ text-transform:uppercase; letter-spacing:.12em; font-size:11.5px; color:var(--celeste); font-weight:800; }
-  h1{ margin:0 0 4px; font-size:24px; font-weight:800; color:var(--cobra-navy); }
-  .subtitle{ color:#3a4a5c; font-size:13px; }
-  main{ padding:26px 32px 30px; }
-  .grid{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
-  .card{ background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:20px 22px; box-shadow:0 4px 14px rgba(20,50,80,.05); }
-  .card .cab{ display:flex; align-items:center; gap:8px; margin-bottom:2px; }
-  .card .cab .icono{ font-size:20px; }
-  .card h2{ margin:0; font-size:16px; color:var(--cobra-navy); }
-  .card .periodo{ font-size:11.5px; color:var(--text-dim); margin-bottom:14px; }
-  .valor-linea{ display:flex; align-items:baseline; gap:10px; margin-bottom:4px; }
-  .valor{ font-size:32px; font-weight:800; }
+  #lienzo{ width:820px; background:#ffffff; }
+  header{ display:flex; align-items:center; gap:8px; background:linear-gradient(120deg,#ffffff 0%,var(--celeste-soft) 60%,#dcf1fb 100%); padding:5px 18px; border-bottom:3px solid var(--celeste); }
+  header img{ height:26px; }
+  .brand-divider{ width:1px; height:20px; background:var(--border); }
+  .eyebrow{ text-transform:uppercase; letter-spacing:.1em; font-size:11px; color:var(--celeste); font-weight:800; }
+  .titulo{ font-size:18px; font-weight:800; color:var(--cobra-navy); line-height:1.1; }
+  .titulo span{ font-weight:400; color:var(--text-dim); font-size:12.5px; }
+  .fila-reporte{ display:flex; align-items:stretch; gap:0; padding:6px 18px; border-bottom:1px solid var(--border); }
+  .fila-reporte:last-of-type{ border-bottom:none; }
+  .bloque-izq{ display:flex; align-items:center; gap:8px; width:200px; flex:none; }
+  .bloque-izq .icono{ font-size:28px; }
+  .card-tit{ font-size:15px; font-weight:700; color:var(--cobra-navy); margin-bottom:0; line-height:1.05; }
+  .valor-linea{ display:flex; align-items:baseline; gap:4px; }
+  .valor{ font-size:30px; font-weight:800; line-height:1; }
   .valor.ok{ color:var(--promotor); }
   .valor.bad{ color:var(--detractor); }
-  .meta-txt{ font-size:12px; color:var(--text-dim); }
-  .pill{ display:inline-flex; align-items:center; gap:5px; padding:3px 11px; border-radius:20px; font-size:11.5px; font-weight:700; margin:6px 0 14px; }
+  .meta-txt{ font-size:11px; color:var(--text-dim); }
+  .pill{ display:inline-flex; align-items:center; gap:3px; padding:1px 8px; border-radius:20px; font-size:11px; font-weight:700; margin-top:1px; }
   .pill.ok{ background:var(--promotor-bg); color:var(--promotor); }
   .pill.bad{ background:var(--detractor-bg); color:var(--detractor); }
-  .bloque-tit{ font-size:11px; text-transform:uppercase; letter-spacing:.05em; font-weight:700; color:var(--text-dim); margin:12px 0 6px; }
-  .fila{ display:flex; justify-content:space-between; font-size:12.5px; padding:4px 0; border-bottom:1px solid var(--panel-2); }
-  .fila .nombre{ color:var(--text); }
-  .fila .num.up{ color:var(--detractor); font-weight:700; }
-  .fila .num.down{ color:var(--promotor); font-weight:700; }
-  footer{ text-align:center; padding:16px; color:var(--text-dim); font-size:11px; border-top:1px solid var(--border); }
+  .divisor{ width:1px; background:var(--panel-2); margin:0 8px; }
+  .col-lista{ flex:0 0 260px; min-width:0; }
+  .bloque-tit{ font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; font-weight:700; color:var(--text-dim); margin-bottom:1px; line-height:1.05; }
+  .fila{ display:flex; align-items:baseline; gap:6px; font-size:13.5px; padding:0; line-height:1.2; }
+  .fila .nombre{ color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; }
+  .fila .num.up{ color:var(--detractor); font-weight:700; flex:none; }
+  .fila .num.down{ color:var(--promotor); font-weight:700; flex:none; }
+  footer{ text-align:center; padding:3px; color:var(--text-dim); font-size:10px; border-top:1px solid var(--border); }
 </style>
 </head>
 <body>
 <div id="lienzo">
   <header>
-    <div class="brand-row">
-      <img src="data:image/png;base64,${logoBase64}" alt="Cobra">
-      <div class="brand-divider"></div>
+    <img src="data:image/png;base64,${logoBase64}" alt="Cobra">
+    <div class="brand-divider"></div>
+    <div>
       <div class="eyebrow">Supervisor · COBRA</div>
+      <div class="titulo">Resumen Diario <span>· ${periodoActual}</span></div>
     </div>
-    <h1>Resumen Diario</h1>
-    <div class="subtitle">Repetido Reparado y Averías de Infancia · ${periodoActual}</div>
   </header>
-  <main>
-    <div class="grid">
-      <div class="card">
-        <div class="cab"><span class="icono">🔁</span><h2>Repetido Reparado</h2></div>
-        <div class="periodo">Reparaciones que vuelven a fallar dentro de 30 días</div>
+
+  <div class="fila-reporte">
+    <div class="bloque-izq">
+      <span class="icono">🔁</span>
+      <div>
+        <div class="card-tit">Repetido Reparado</div>
         <div class="valor-linea"><span class="valor ${claseEstado(r.tasaGlobal, r.meta)}">${r.tasaGlobal}%</span><span class="meta-txt">Meta ${r.meta}%</span></div>
         <div class="pill ${claseEstado(r.tasaGlobal, r.meta)}">${textoEstado(r.tasaGlobal, r.meta)}</div>
-        <div class="bloque-tit">🟢 Más mejoraron</div>
-        ${filasVariacion(r.masMejoraron, 'mejoraron')}
-        <div class="bloque-tit">🔴 Más empeoraron</div>
-        ${filasVariacion(r.masEmpeoraron, 'empeoraron')}
-      </div>
-      <div class="card">
-        <div class="cab"><span class="icono">🏠</span><h2>Averías de Infancia</h2></div>
-        <div class="periodo">Instalaciones que fallan poco después de instaladas</div>
-        <div class="valor-linea"><span class="valor ${claseEstado(i.tasaGlobal, i.meta)}">${i.tasaGlobal}%</span><span class="meta-txt">Meta ${i.meta}%</span></div>
-        <div class="pill ${claseEstado(i.tasaGlobal, i.meta)}">${textoEstado(i.tasaGlobal, i.meta)}</div>
-        <div class="bloque-tit">🟢 Más mejoraron</div>
-        ${filasVariacion(i.masMejoraron, 'mejoraron')}
-        <div class="bloque-tit">🔴 Más empeoraron</div>
-        ${filasVariacion(i.masEmpeoraron, 'empeoraron')}
       </div>
     </div>
-  </main>
+    <div class="divisor"></div>
+    <div class="col-lista">
+      <div class="bloque-tit">🟢 Más mejoraron</div>
+      ${filasVariacion(r.masMejoraron, 'mejoraron', 2)}
+    </div>
+    <div class="divisor"></div>
+    <div class="col-lista">
+      <div class="bloque-tit">🔴 Más empeoraron</div>
+      ${filasVariacion(r.masEmpeoraron, 'empeoraron', 2)}
+    </div>
+  </div>
+
+  <div class="fila-reporte">
+    <div class="bloque-izq">
+      <span class="icono">🏠</span>
+      <div>
+        <div class="card-tit">Averías de Infancia</div>
+        <div class="valor-linea"><span class="valor ${claseEstado(i.tasaGlobal, i.meta)}">${i.tasaGlobal}%</span><span class="meta-txt">Meta ${i.meta}%</span></div>
+        <div class="pill ${claseEstado(i.tasaGlobal, i.meta)}">${textoEstado(i.tasaGlobal, i.meta)}</div>
+      </div>
+    </div>
+    <div class="divisor"></div>
+    <div class="col-lista">
+      <div class="bloque-tit">🟢 Más mejoraron</div>
+      ${filasVariacion(i.masMejoraron, 'mejoraron', 2)}
+    </div>
+    <div class="divisor"></div>
+    <div class="col-lista">
+      <div class="bloque-tit">🔴 Más empeoraron</div>
+      ${filasVariacion(i.masEmpeoraron, 'empeoraron', 2)}
+    </div>
+  </div>
+
   <footer>Generado ${generadoEl} · Datos de Reincidencias/Infancia COBRA (zona Punta Arenas / Coyhaique)</footer>
 </div>
 </body>
@@ -176,18 +193,22 @@ function main() {
     // asi no hace falta calcular la altura exacta de antemano.
     execFileSync(navegador, [
       '--headless=new', '--disable-gpu', '--hide-scrollbars',
-      '--window-size=760,1000',
+      '--window-size=820,700',
       '--screenshot=' + TEMP_PNG,
       'file:///' + TEMP_HTML.replace(/\\/g, '/'),
     ], { stdio: 'ignore', timeout: 30000 });
 
     const sharp = require('sharp');
-    sharp(TEMP_PNG).trim().toFile(OUTPUT_PNG).then(() => {
+    // Se recorta el margen blanco sobrante y despues se reduce a un ancho
+    // fijo (ANCHO_FINAL) -- el diseno es ancho y bajo (franjas horizontales)
+    // a proposito, para que se vea bien en un correo sin ocupar mucho alto.
+    const ANCHO_FINAL = 820;
+    sharp(TEMP_PNG).trim().resize({ width: ANCHO_FINAL }).toFile(OUTPUT_PNG).then(() => {
       fs.unlinkSync(TEMP_PNG);
       fs.unlinkSync(TEMP_HTML);
       console.log('==> Resumen para correo generado:', OUTPUT_PNG);
     }).catch((err) => {
-      console.log('AVISO: fallo al recortar la imagen (' + err.message + '); se deja sin recortar.');
+      console.log('AVISO: fallo al recortar/reducir la imagen (' + err.message + '); se deja sin procesar.');
       fs.renameSync(TEMP_PNG, OUTPUT_PNG);
       fs.unlinkSync(TEMP_HTML);
     });
