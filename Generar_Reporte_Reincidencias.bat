@@ -45,6 +45,11 @@ if exist Resumen_Diario_Correo.png (
 )
 
 echo.
+echo Copiando INF-09 (produccion / productividad) desde OneDrive...
+echo.
+call copiar_baremos.bat
+
+echo.
 echo Actualizando indice...
 echo.
 node generar_indice.js
@@ -54,11 +59,6 @@ if errorlevel 1 (
     pause
     exit /b 1
 )
-
-echo.
-echo Copiando INF-09 (baremos / productividad) desde OneDrive...
-echo.
-call copiar_baremos.bat
 
 echo.
 echo Generando Portal de Tecnicos...
