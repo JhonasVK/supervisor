@@ -200,7 +200,7 @@ function plantilla(json) {
     <div class="eyebrow">Calidad &amp; Capacitacion &middot; Produccion</div>
   </div>
   <h1>Informe de Produccion</h1>
-  <div class="subtitle">Produccion por tecnico de las agencias Punta Arenas y Coyhaique, a partir del INF-09: cantidad de productos (instala / repara), dias trabajados, productos por dia y puntos baremo (columna R).</div>
+  <div class="subtitle">Produccion por tecnico de las agencias Punta Arenas y Coyhaique, a partir del INF-09: cantidad de productos (instala / repara), dias trabajados, productos por dia y puntos baremo.</div>
   <div class="meta-row" id="metaRow"></div>
 </header>
 
@@ -220,7 +220,7 @@ function plantilla(json) {
 
   <section>
     <div class="section-title"><span class="num">03</span><h2>Ranking de tecnicos</h2></div>
-    <p class="section-desc">Ordenado de mayor a menor puntos baremo (columna R). Prod/dia coloreado contra la meta de <span id="metaTxt"></span> productos/dia.</p>
+    <p class="section-desc">Ordenado de mayor a menor puntos baremo. Prod/dia coloreado contra la meta de <span id="metaTxt"></span> productos/dia.</p>
     <div class="tabla-wrap panel"><table id="tablaTecnicos"></table></div>
   </section>
 </main>
@@ -237,7 +237,7 @@ document.getElementById('footerText').textContent = 'Informe de Produccion COBRA
 var k = DATA.kpis;
 document.getElementById('kpiGrid').innerHTML = [
   '<div class="kpi-card"><div class="label">Productos totales</div><div class="value hl">' + k.productos + '</div><div class="sub">' + k.ordenes + ' ordenes</div></div>',
-  '<div class="kpi-card"><div class="label">Puntos baremo</div><div class="value">' + k.baremos + '</div><div class="sub">columna R</div></div>',
+  '<div class="kpi-card"><div class="label">Puntos baremo</div><div class="value">' + k.baremos + '</div><div class="sub">total del periodo</div></div>',
   '<div class="kpi-card"><div class="label">Productos / dia</div><div class="value">' + (k.prodDia == null ? '-' : k.prodDia) + '</div><div class="sub">promedio por tecnico &middot; meta ' + DATA.meta + '</div></div>',
   '<div class="kpi-card"><div class="label">Baremo / dia</div><div class="value">' + (k.barDia == null ? '-' : k.barDia) + '</div><div class="sub">promedio por tecnico</div></div>',
 ].join('');
@@ -278,7 +278,7 @@ document.getElementById('kpiGrid').innerHTML = [
     options: {
       indexAxis: 'y', responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false } },
-      scales: { x: { title: { display: true, text: 'Puntos baremo (columna R)' }, grid: { color: 'rgba(20,50,80,0.06)' } } },
+      scales: { x: { title: { display: true, text: 'Puntos baremo' }, grid: { color: 'rgba(20,50,80,0.06)' } } },
     },
   });
 })();

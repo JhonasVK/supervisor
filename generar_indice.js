@@ -366,7 +366,7 @@ const html = `<!DOCTYPE html>
     ${actualizadoProduccion ? `<a class="card" href="Dashboard_Produccion.html">
       <div class="card-icon">📊</div>
       <h2>Produccion por tecnicos</h2>
-      <p>Produccion por tecnico de Punta Arenas y Coyhaique (INF-09): productos instala/repara, dias trabajados, productos por dia y puntos baremo (columna R).</p>
+      <p>Produccion por tecnico de Punta Arenas y Coyhaique (INF-09): productos instala/repara, dias trabajados, productos por dia y puntos baremo.</p>
       <div class="card-meta">Meta: ${META_PRODUCTIVIDAD}/dia &nbsp;&bull;&nbsp; Actualizado: ${actualizadoProduccion}</div>
       <div class="card-cta">Ver informe &rarr;</div>
     </a>` : ''}
