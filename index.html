@@ -62,8 +62,9 @@
 
   .kpi-panel{ background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:20px 24px 16px; box-shadow:0 10px 24px rgba(20,50,80,.06); margin-bottom:26px; }
   .kpi-panel-head{ font-size:12px; text-transform:uppercase; letter-spacing:.06em; font-weight:800; color:var(--text-dim); margin-bottom:12px; }
-  .kpi-cols{ display:flex; gap:40px; flex-wrap:wrap; }
-  .kpi-table{ border-collapse:collapse; font-size:13.5px; }
+  .kpi-cols{ display:grid; grid-template-columns:1fr 1fr; gap:30px; align-items:start; }
+  @media (max-width:760px){ .kpi-cols{ grid-template-columns:1fr; } }
+  .kpi-table{ width:100%; border-collapse:collapse; font-size:13.5px; }
   .kpi-table th{ text-align:right; font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--text-dim); font-weight:800; padding:4px 10px 8px; }
   .kpi-table th:first-child{ text-align:left; color:var(--cobra-navy); }
   .kpi-table td{ padding:5px 10px; text-align:right; font-weight:800; color:var(--cobra-navy); white-space:nowrap; }
