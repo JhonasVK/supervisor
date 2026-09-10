@@ -178,6 +178,9 @@ function plantilla(json) {
   .tabla-wrap{ overflow-x:auto; }
   table{ width:100%; border-collapse:collapse; font-size:13px; }
   th{ text-align:right; color:var(--text-dim); font-weight:700; font-size:11px; text-transform:uppercase; letter-spacing:.04em; padding:9px 9px; border-bottom:1px solid var(--border); white-space:nowrap; }
+  th.sortable{ cursor:pointer; }
+  th.sortable:hover{ color:var(--cobra-blue); }
+  th.sorted{ color:var(--cobra-blue); }
   th:nth-child(2){ text-align:left; }
   td{ padding:8px 9px; border-bottom:1px solid var(--panel-2); text-align:right; white-space:nowrap; }
   td:nth-child(2){ text-align:left; color:var(--cobra-navy); font-weight:600; }
@@ -254,16 +257,60 @@ document.getElementById('kpiGrid').innerHTML = [
   document.getElementById('tablaAgencia').innerHTML = head + rows;
 })();
 
-// ---- Ranking de tecnicos ----
+// ---- Ranking de tecnicos (columnas ordenables) ----
 (function () {
-  var head = '<tr><th>#</th><th>Tecnico</th><th>Agencia</th><th>Ordenes</th><th>Instala</th><th>Repara</th><th>Total prod.</th><th>Dias</th><th>Prod/dia</th><th>Puntos baremo</th></tr>';
-  var rows = DATA.tecnicos.map(function (t, i) {
-    var pc = t.prodDia == null ? '' : (t.prodDia >= DATA.meta ? 'val-ok' : 'val-bad');
-    return '<tr><td>' + (i + 1) + '</td><td>' + t.nombre + '</td><td class="ag">' + t.agencia + '</td><td>' + t.ordenes + '</td>'
-      + '<td>' + t.instala + '</td><td>' + t.repara + '</td><td class="b">' + t.productos + '</td><td>' + t.dias + '</td>'
-      + '<td class="' + pc + '">' + (t.prodDia == null ? '-' : t.prodDia) + '</td><td class="b">' + t.baremos + '</td></tr>';
-  }).join('');
-  document.getElementById('tablaTecnicos').innerHTML = head + rows;
+  var cols = [
+    { th: '#', key: null },
+    { th: 'Tecnico', key: 'nombre', type: 's' },
+    { th: 'Agencia', key: 'agencia', type: 's' },
+    { th: 'Ordenes', key: 'ordenes', type: 'n' },
+    { th: 'Instala', key: 'instala', type: 'n' },
+    { th: 'Repara', key: 'repara', type: 'n' },
+    { th: 'Total prod.', key: 'productos', type: 'n' },
+    { th: 'Dias', key: 'dias', type: 'n' },
+    { th: 'Prod/dia', key: 'prodDia', type: 'n' },
+    { th: 'Puntos baremo', key: 'baremos', type: 'n' },
+  ];
+  var sortKey = 'baremos', sortDir = -1; // -1 = mayor a menor, 1 = menor a mayor
+  var tabla = document.getElementById('tablaTecnicos');
+
+  function tipoDe(k) { for (var i = 0; i < cols.length; i++) if (cols[i].key === k) return cols[i].type; return 'n'; }
+
+  function render() {
+    var arr = DATA.tecnicos.slice();
+    var esTexto = tipoDe(sortKey) === 's';
+    arr.sort(function (a, b) {
+      var x = a[sortKey], y = b[sortKey];
+      if (esTexto) {
+        x = ('' + x).toLowerCase(); y = ('' + y).toLowerCase();
+        return x < y ? -sortDir : x > y ? sortDir : 0;
+      }
+      x = (x == null ? -Infinity : x); y = (y == null ? -Infinity : y);
+      return (x - y) * sortDir;
+    });
+    var flecha = sortDir === -1 ? ' ▼' : ' ▲';
+    var head = '<tr>' + cols.map(function (c) {
+      if (!c.key) return '<th>' + c.th + '</th>';
+      var act = c.key === sortKey;
+      return '<th class="sortable' + (act ? ' sorted' : '') + '" data-k="' + c.key + '" title="Ordenar por ' + c.th + '">' + c.th + (act ? flecha : '') + '</th>';
+    }).join('') + '</tr>';
+    var rows = arr.map(function (t, i) {
+      var pc = t.prodDia == null ? '' : (t.prodDia >= DATA.meta ? 'val-ok' : 'val-bad');
+      return '<tr><td>' + (i + 1) + '</td><td>' + t.nombre + '</td><td class="ag">' + t.agencia + '</td><td>' + t.ordenes + '</td>'
+        + '<td>' + t.instala + '</td><td>' + t.repara + '</td><td class="b">' + t.productos + '</td><td>' + t.dias + '</td>'
+        + '<td class="' + pc + '">' + (t.prodDia == null ? '-' : t.prodDia) + '</td><td class="b">' + t.baremos + '</td></tr>';
+    }).join('');
+    tabla.innerHTML = head + rows;
+    Array.prototype.forEach.call(tabla.querySelectorAll('th.sortable'), function (th) {
+      th.addEventListener('click', function () {
+        var k = th.getAttribute('data-k');
+        if (k === sortKey) { sortDir = -sortDir; }
+        else { sortKey = k; sortDir = tipoDe(k) === 's' ? 1 : -1; }
+        render();
+      });
+    });
+  }
+  render();
 })();
 
 // ---- Chart: top 10 por puntos baremo ----
