@@ -56,6 +56,11 @@ if errorlevel 1 (
 )
 
 echo.
+echo Copiando INF-09 (baremos / productividad) desde OneDrive...
+echo.
+call copiar_baremos.bat
+
+echo.
 echo Generando Portal de Tecnicos...
 echo.
 pushd portal-tecnicos

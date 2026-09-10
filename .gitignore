@@ -1,5 +1,6 @@
 node_modules/
 bbdd/
+baremosTigo/
 *.xlsx
 *.xlsm
 portal-tecnicos/
