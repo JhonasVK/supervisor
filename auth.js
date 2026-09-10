@@ -23,7 +23,9 @@
     rcerda:      '91d50f2230e30ebe4bdb8bbb1e4cae66f6049353a0960a1443a5a9e6c9dca4bd',
     tcontreras:  '84a063ef1d39ad6df9578d0389a3eb6d472d2769973d91494aa6473df028fee8',
     jvodnizza:   '165bc0849067edd4c6cad7f79fabbdc93cfe4169738fdf74e8caf8996dd48f20',
-    amanrriquez: '5e3020f9f2c77ad69039767c6921ae00760010ffc26dc13400a0c2e592cf0e05'
+    amanrriquez: '5e3020f9f2c77ad69039767c6921ae00760010ffc26dc13400a0c2e592cf0e05',
+    jbaez:       '4c444b9fe4bb2ece193c6ddafadca08b0c1e226cc087fc171f68c2e33544baf1',
+    cquiroz:     '790cc118f6e5c7a78b7b4016feb1212978f42fb048f05634373b9e7cb8c24ccb'
   };
 
   function ocultar()  { try { document.documentElement.style.visibility = 'hidden'; } catch (e) {} }
