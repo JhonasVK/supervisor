@@ -25,7 +25,8 @@
     jvodnizza:   '165bc0849067edd4c6cad7f79fabbdc93cfe4169738fdf74e8caf8996dd48f20',
     amanrriquez: '5e3020f9f2c77ad69039767c6921ae00760010ffc26dc13400a0c2e592cf0e05',
     jbaez:       '4c444b9fe4bb2ece193c6ddafadca08b0c1e226cc087fc171f68c2e33544baf1',
-    cquiroz:     '790cc118f6e5c7a78b7b4016feb1212978f42fb048f05634373b9e7cb8c24ccb'
+    cquiroz:     '790cc118f6e5c7a78b7b4016feb1212978f42fb048f05634373b9e7cb8c24ccb',
+    fflores:     'ae89c196e6c42f781261f0a910c2a59c1b4d938a3de19279eeed58862978d0eb'
   };
 
   function ocultar()  { try { document.documentElement.style.visibility = 'hidden'; } catch (e) {} }
