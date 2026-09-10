@@ -50,6 +50,17 @@ echo.
 call copiar_baremos.bat
 
 echo.
+echo Generando informe de Produccion por tecnicos...
+echo.
+node generar_produccion.js
+if errorlevel 1 (
+    echo.
+    echo Ocurrio un error generando el informe de Produccion. Revisa el mensaje de arriba.
+    pause
+    exit /b 1
+)
+
+echo.
 echo Actualizando indice...
 echo.
 node generar_indice.js

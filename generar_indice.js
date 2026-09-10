@@ -52,6 +52,7 @@ function fechaArchivo(nombre) {
 
 const actualizadoReincidencias = fechaArchivo('Dashboard_Reincidencias.html');
 const actualizadoInfancia = fechaArchivo('Dashboard_Infancia.html');
+const actualizadoProduccion = fechaArchivo('Dashboard_Produccion.html');
 
 // ---------- Resumen por agencia (panel superior, solo lo ve el supervisor) ----------
 
@@ -362,6 +363,13 @@ const html = `<!DOCTYPE html>
       actualizado: actualizadoInfancia,
       meses: mesesInfancia.length,
     })}
+    ${actualizadoProduccion ? `<a class="card" href="Dashboard_Produccion.html">
+      <div class="card-icon">📊</div>
+      <h2>Produccion por tecnicos</h2>
+      <p>Produccion por tecnico de Punta Arenas y Coyhaique (INF-09): productos instala/repara, dias trabajados, productos por dia y puntos baremo (columna R).</p>
+      <div class="card-meta">Meta: ${META_PRODUCTIVIDAD}/dia &nbsp;&bull;&nbsp; Actualizado: ${actualizadoProduccion}</div>
+      <div class="card-cta">Ver informe &rarr;</div>
+    </a>` : ''}
     ${tarjetaExterna({
       href: 'https://jhonasvk.github.io/dashboard-auditorias-tigo/',
       icono: '🧾',
