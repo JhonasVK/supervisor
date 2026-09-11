@@ -1,8 +1,9 @@
-// Genera Dashboard_Produccion.html a partir del INF-09 (produccion / baremos
-// de Punta Arenas + Coyhaique) que copiamos a baremosTigo\. Es un informe
-// SOLO para el supervisor (incluye baremos = datos de pago), enlazado desde
-// el indice. Se regenera con Generar_Reporte_Reincidencias.bat, despues de
-// copiar_baremos.bat.
+// Genera Dashboard_Produccion.html a partir del INF-09 (produccion de
+// Punta Arenas + Coyhaique) que copiamos a baremosTigo\. Es un informe
+// SOLO para el supervisor, enlazado desde el indice. NO incluye puntos
+// baremo (columna R) -- solo productos instala/repara/total, dias
+// trabajados y productos/dia. Se regenera con
+// Generar_Reporte_Reincidencias.bat, despues de copiar_baremos.bat.
 
 const fs = require('fs');
 const path = require('path');
@@ -45,10 +46,11 @@ async function main() {
     return;
   }
 
-  // Columnas: 1 Folio | 2 Agencia | 4 Baremos | 5 Nro Productos | 6 RUT | 7 Nombre | 10 Dia | 14 Tipo | 18 Baremos a Pago
+  // Columnas: 1 Folio | 2 Agencia | 5 Nro Productos | 6 RUT | 7 Nombre | 10 Dia | 14 Tipo
+  // (No se lee la columna R / punto baremo: este informe no publica baremos.)
   const porRut = {};
   const porAgencia = {};
-  const global = { ordenes: 0, productos: 0, instala: 0, repara: 0, baremos: 0, ruts: new Set(), td: new Set() };
+  const global = { ordenes: 0, productos: 0, instala: 0, repara: 0, ruts: new Set(), td: new Set() };
 
   for (let i = 2; i <= ws.rowCount; i++) {
     const row = ws.getRow(i);
@@ -59,23 +61,22 @@ async function main() {
     const nombre = (row.getCell(7).value || '').toString().trim();
     const dia = Number(row.getCell(10).value);
     const tipo = (row.getCell(14).value || '').toString().trim();
-    const baremo = Number(row.getCell(18).value) || 0; // columna R = punto baremo (a pago)
     if (!rut) continue;
 
-    if (!porRut[rut]) porRut[rut] = { nombre, agencia, ordenes: 0, productos: 0, instala: 0, repara: 0, baremos: 0, dias: new Set() };
+    if (!porRut[rut]) porRut[rut] = { nombre, agencia, ordenes: 0, productos: 0, instala: 0, repara: 0, dias: new Set() };
     const t = porRut[rut];
-    t.ordenes += 1; t.productos += prod; t.baremos += baremo;
+    t.ordenes += 1; t.productos += prod;
     if (tipo === 'Instala') t.instala += prod; else if (tipo === 'Repara') t.repara += prod;
     if (Number.isFinite(dia)) t.dias.add(dia);
 
-    if (!porAgencia[agencia]) porAgencia[agencia] = { ordenes: 0, productos: 0, instala: 0, repara: 0, baremos: 0, ruts: new Set(), td: new Set() };
+    if (!porAgencia[agencia]) porAgencia[agencia] = { ordenes: 0, productos: 0, instala: 0, repara: 0, ruts: new Set(), td: new Set() };
     const a = porAgencia[agencia];
     a.ordenes += 1; a.productos += prod; a.instala += (tipo === 'Instala' ? prod : 0); a.repara += (tipo === 'Repara' ? prod : 0);
-    a.baremos += baremo; a.ruts.add(rut);
+    a.ruts.add(rut);
     if (Number.isFinite(dia)) a.td.add(rut + '|' + dia);
 
     global.ordenes += 1; global.productos += prod; global.instala += (tipo === 'Instala' ? prod : 0); global.repara += (tipo === 'Repara' ? prod : 0);
-    global.baremos += baremo; global.ruts.add(rut);
+    global.ruts.add(rut);
     if (Number.isFinite(dia)) global.td.add(rut + '|' + dia);
   }
 
@@ -88,18 +89,15 @@ async function main() {
       ordenes: t.ordenes,
       instala: +t.instala.toFixed(1), repara: +t.repara.toFixed(1), productos: +t.productos.toFixed(1),
       dias, prodDia: dias ? +(t.productos / dias).toFixed(1) : null,
-      baremos: +t.baremos.toFixed(1),
     };
-  }).sort((a, b) => b.baremos - a.baremos);
+  }).sort((a, b) => b.productos - a.productos);
 
   const agencias = Object.entries(porAgencia).map(([ag, a]) => ({
     agencia: titleCase(ag),
     tecnicos: a.ruts.size, ordenes: a.ordenes,
     instala: +a.instala.toFixed(1), repara: +a.repara.toFixed(1), productos: +a.productos.toFixed(1),
-    baremos: +a.baremos.toFixed(1),
     prodDia: a.td.size ? +(a.productos / a.td.size).toFixed(1) : null,
-    barDia: a.td.size ? +(a.baremos / a.td.size).toFixed(1) : null,
-  })).sort((a, b) => b.baremos - a.baremos);
+  })).sort((a, b) => b.productos - a.productos);
 
   const m = cand.f.match(/(Enero|Febrero|Marzo|Abril|Mayo|Junio|Julio|Agosto|Septiembre|Octubre|Noviembre|Diciembre)\s+(\d{4})/i);
   const periodo = m ? (m[1] + ' ' + m[2]) : cand.f;
@@ -112,11 +110,9 @@ async function main() {
     meta: META_PRODUCTIVIDAD,
     kpis: {
       productos: +global.productos.toFixed(1),
-      baremos: +global.baremos.toFixed(1),
       tecnicos: gTecnicos,
       ordenes: global.ordenes,
       prodDia: gTd ? +(global.productos / gTd).toFixed(1) : null,
-      barDia: gTd ? +(global.baremos / gTd).toFixed(1) : null,
     },
     agencias,
     tecnicos,
@@ -203,7 +199,7 @@ function plantilla(json) {
     <div class="eyebrow">Calidad &amp; Capacitacion &middot; Produccion</div>
   </div>
   <h1>Informe de Produccion</h1>
-  <div class="subtitle">Produccion por tecnico de las agencias Punta Arenas y Coyhaique, a partir del INF-09: cantidad de productos (instala / repara), dias trabajados, productos por dia y puntos baremo.</div>
+  <div class="subtitle">Produccion por tecnico de las agencias Punta Arenas y Coyhaique, a partir del INF-09: cantidad de productos (instala / repara), dias trabajados y productos por dia.</div>
   <div class="meta-row" id="metaRow"></div>
 </header>
 
@@ -217,13 +213,13 @@ function plantilla(json) {
   </section>
 
   <section>
-    <div class="section-title"><span class="num">02</span><h2>Top tecnicos por puntos baremo</h2></div>
+    <div class="section-title"><span class="num">02</span><h2>Top tecnicos por productos totales</h2></div>
     <div class="panel" style="height:340px;"><canvas id="chartTop"></canvas></div>
   </section>
 
   <section>
     <div class="section-title"><span class="num">03</span><h2>Ranking de tecnicos</h2></div>
-    <p class="section-desc">Ordenado de mayor a menor puntos baremo. Prod/dia coloreado contra la meta de <span id="metaTxt"></span> productos/dia.</p>
+    <p class="section-desc">Ordenado de mayor a menor total de productos. Prod/dia coloreado contra la meta de <span id="metaTxt"></span> productos/dia.</p>
     <div class="tabla-wrap panel"><table id="tablaTecnicos"></table></div>
   </section>
 </main>
@@ -240,19 +236,17 @@ document.getElementById('footerText').textContent = 'Informe de Produccion COBRA
 var k = DATA.kpis;
 document.getElementById('kpiGrid').innerHTML = [
   '<div class="kpi-card"><div class="label">Productos totales</div><div class="value hl">' + k.productos + '</div><div class="sub">' + k.ordenes + ' ordenes</div></div>',
-  '<div class="kpi-card"><div class="label">Puntos baremo</div><div class="value">' + k.baremos + '</div><div class="sub">total del periodo</div></div>',
+  '<div class="kpi-card"><div class="label">Tecnicos</div><div class="value">' + k.tecnicos + '</div><div class="sub">con produccion en el periodo</div></div>',
   '<div class="kpi-card"><div class="label">Productos / dia</div><div class="value">' + (k.prodDia == null ? '-' : k.prodDia) + '</div><div class="sub">promedio por tecnico &middot; meta ' + DATA.meta + '</div></div>',
-  '<div class="kpi-card"><div class="label">Baremo / dia</div><div class="value">' + (k.barDia == null ? '-' : k.barDia) + '</div><div class="sub">promedio por tecnico</div></div>',
 ].join('');
 
 // ---- Tabla por agencia ----
 (function () {
-  var head = '<tr><th>Agencia</th><th>Tecnicos</th><th>Ordenes</th><th>Instala</th><th>Repara</th><th>Total prod.</th><th>Prod/dia</th><th>Puntos baremo</th><th>Baremo/dia</th></tr>';
+  var head = '<tr><th>Agencia</th><th>Tecnicos</th><th>Ordenes</th><th>Instala</th><th>Repara</th><th>Total prod.</th><th>Prod/dia</th></tr>';
   var rows = DATA.agencias.map(function (a) {
     var pc = a.prodDia == null ? '' : (a.prodDia >= DATA.meta ? 'val-ok' : 'val-bad');
     return '<tr><td class="ag">' + a.agencia + '</td><td>' + a.tecnicos + '</td><td>' + a.ordenes + '</td><td>' + a.instala + '</td><td>' + a.repara + '</td>'
-      + '<td class="b">' + a.productos + '</td><td class="' + pc + '">' + (a.prodDia == null ? '-' : a.prodDia) + '</td>'
-      + '<td class="b">' + a.baremos + '</td><td>' + (a.barDia == null ? '-' : a.barDia) + '</td></tr>';
+      + '<td class="b">' + a.productos + '</td><td class="' + pc + '">' + (a.prodDia == null ? '-' : a.prodDia) + '</td></tr>';
   }).join('');
   document.getElementById('tablaAgencia').innerHTML = head + rows;
 })();
@@ -269,9 +263,8 @@ document.getElementById('kpiGrid').innerHTML = [
     { th: 'Total prod.', key: 'productos', type: 'n' },
     { th: 'Dias', key: 'dias', type: 'n' },
     { th: 'Prod/dia', key: 'prodDia', type: 'n' },
-    { th: 'Puntos baremo', key: 'baremos', type: 'n' },
   ];
-  var sortKey = 'baremos', sortDir = -1; // -1 = mayor a menor, 1 = menor a mayor
+  var sortKey = 'productos', sortDir = -1; // -1 = mayor a menor, 1 = menor a mayor
   var tabla = document.getElementById('tablaTecnicos');
 
   function tipoDe(k) { for (var i = 0; i < cols.length; i++) if (cols[i].key === k) return cols[i].type; return 'n'; }
@@ -298,7 +291,7 @@ document.getElementById('kpiGrid').innerHTML = [
       var pc = t.prodDia == null ? '' : (t.prodDia >= DATA.meta ? 'val-ok' : 'val-bad');
       return '<tr><td>' + (i + 1) + '</td><td>' + t.nombre + '</td><td class="ag">' + t.agencia + '</td><td>' + t.ordenes + '</td>'
         + '<td>' + t.instala + '</td><td>' + t.repara + '</td><td class="b">' + t.productos + '</td><td>' + t.dias + '</td>'
-        + '<td class="' + pc + '">' + (t.prodDia == null ? '-' : t.prodDia) + '</td><td class="b">' + t.baremos + '</td></tr>';
+        + '<td class="' + pc + '">' + (t.prodDia == null ? '-' : t.prodDia) + '</td></tr>';
     }).join('');
     tabla.innerHTML = head + rows;
     Array.prototype.forEach.call(tabla.querySelectorAll('th.sortable'), function (th) {
@@ -313,19 +306,19 @@ document.getElementById('kpiGrid').innerHTML = [
   render();
 })();
 
-// ---- Chart: top 10 por puntos baremo ----
+// ---- Chart: top 10 por productos totales ----
 (function () {
-  var top = DATA.tecnicos.slice(0, 10);
+  var top = DATA.tecnicos.slice().sort(function (a, b) { return b.productos - a.productos; }).slice(0, 10);
   new Chart(document.getElementById('chartTop'), {
     type: 'bar',
     data: {
       labels: top.map(function (t) { return t.nombre; }),
-      datasets: [{ label: 'Puntos baremo', data: top.map(function (t) { return t.baremos; }), backgroundColor: 'rgba(0,113,206,0.85)', borderRadius: 6, maxBarThickness: 34 }],
+      datasets: [{ label: 'Productos totales', data: top.map(function (t) { return t.productos; }), backgroundColor: 'rgba(0,113,206,0.85)', borderRadius: 6, maxBarThickness: 34 }],
     },
     options: {
       indexAxis: 'y', responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false } },
-      scales: { x: { title: { display: true, text: 'Puntos baremo' }, grid: { color: 'rgba(20,50,80,0.06)' } } },
+      scales: { x: { title: { display: true, text: 'Productos totales' }, grid: { color: 'rgba(20,50,80,0.06)' } } },
     },
   });
 })();

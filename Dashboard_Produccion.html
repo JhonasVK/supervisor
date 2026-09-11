@@ -70,7 +70,7 @@
     <div class="eyebrow">Calidad &amp; Capacitacion &middot; Produccion</div>
   </div>
   <h1>Informe de Produccion</h1>
-  <div class="subtitle">Produccion por tecnico de las agencias Punta Arenas y Coyhaique, a partir del INF-09: cantidad de productos (instala / repara), dias trabajados, productos por dia y puntos baremo.</div>
+  <div class="subtitle">Produccion por tecnico de las agencias Punta Arenas y Coyhaique, a partir del INF-09: cantidad de productos (instala / repara), dias trabajados y productos por dia.</div>
   <div class="meta-row" id="metaRow"></div>
 </header>
 
@@ -84,13 +84,13 @@
   </section>
 
   <section>
-    <div class="section-title"><span class="num">02</span><h2>Top tecnicos por puntos baremo</h2></div>
+    <div class="section-title"><span class="num">02</span><h2>Top tecnicos por productos totales</h2></div>
     <div class="panel" style="height:340px;"><canvas id="chartTop"></canvas></div>
   </section>
 
   <section>
     <div class="section-title"><span class="num">03</span><h2>Ranking de tecnicos</h2></div>
-    <p class="section-desc">Ordenado de mayor a menor puntos baremo. Prod/dia coloreado contra la meta de <span id="metaTxt"></span> productos/dia.</p>
+    <p class="section-desc">Ordenado de mayor a menor total de productos. Prod/dia coloreado contra la meta de <span id="metaTxt"></span> productos/dia.</p>
     <div class="tabla-wrap panel"><table id="tablaTecnicos"></table></div>
   </section>
 </main>
@@ -98,7 +98,7 @@
 <footer id="footerText"></footer>
 
 <script>
-const DATA = {"periodo":"Septiembre 2026","generadoEl":"10-09-2026, 7:33:44 p. m.","meta":5,"kpis":{"productos":959,"baremos":1029.4,"tecnicos":20,"ordenes":638,"prodDia":6.4,"barDia":6.8},"agencias":[{"agencia":"Punta Arenas","tecnicos":17,"ordenes":539,"instala":479,"repara":295,"productos":774,"baremos":851.5,"prodDia":6.1,"barDia":6.7},{"agencia":"Coyhaique","tecnicos":3,"ordenes":99,"instala":157,"repara":28,"productos":185,"baremos":178,"prodDia":7.7,"barDia":7.4}],"tecnicos":[{"nombre":"Victor Hugo Barria Almonacid","agencia":"Punta Arenas","ordenes":51,"instala":43,"repara":26,"productos":69,"dias":8,"prodDia":8.6,"baremos":92.3},{"nombre":"Jose Alexis Barria Almonacid","agencia":"Punta Arenas","ordenes":44,"instala":38,"repara":25,"productos":63,"dias":7,"prodDia":9,"baremos":90.5},{"nombre":"Carlos Roberto Saldivia Hernandez","agencia":"Punta Arenas","ordenes":33,"instala":28,"repara":18,"productos":46,"dias":8,"prodDia":5.8,"baremos":72.4},{"nombre":"Axel Leonardo Alfaro Alvarez","agencia":"Coyhaique","ordenes":36,"instala":58,"repara":9,"productos":67,"dias":8,"prodDia":8.4,"baremos":63},{"nombre":"Luis Eduardo Cisternas Oyarzo","agencia":"Coyhaique","ordenes":31,"instala":50,"repara":10,"productos":60,"dias":8,"prodDia":7.5,"baremos":58.6},{"nombre":"Julio Lopez Cortes","agencia":"Coyhaique","ordenes":32,"instala":49,"repara":9,"productos":58,"dias":8,"prodDia":7.3,"baremos":56.3},{"nombre":"Marcos Alejandro Aguilar Roa","agencia":"Punta Arenas","ordenes":34,"instala":37,"repara":17,"productos":54,"dias":8,"prodDia":6.8,"baremos":53.4},{"nombre":"Egon Rodrigo Villarroel Zuniga","agencia":"Punta Arenas","ordenes":30,"instala":43,"repara":8,"productos":51,"dias":8,"prodDia":6.4,"baremos":49.7},{"nombre":"Rene Eduardo Mayorga Leuquen","agencia":"Punta Arenas","ordenes":35,"instala":22,"repara":23,"productos":45,"dias":8,"prodDia":5.6,"baremos":49.2},{"nombre":"Miguel Alejandro Alvarado Vivar","agencia":"Punta Arenas","ordenes":33,"instala":34,"repara":17,"productos":51,"dias":8,"prodDia":6.4,"baremos":48.7},{"nombre":"Roberto Esteban Diaz Garrido","agencia":"Punta Arenas","ordenes":33,"instala":34,"repara":13,"productos":47,"dias":8,"prodDia":5.9,"baremos":48.7},{"nombre":"Rodrigo Eduardo Godoy Carcamo","agencia":"Punta Arenas","ordenes":35,"instala":24,"repara":21,"productos":45,"dias":8,"prodDia":5.6,"baremos":46.6},{"nombre":"Luis Alfonso Barrientos Munoz","agencia":"Punta Arenas","ordenes":31,"instala":33,"repara":15,"productos":48,"dias":8,"prodDia":6,"baremos":44.7},{"nombre":"Gabriel Leonidas Ramirez Ibarra","agencia":"Punta Arenas","ordenes":27,"instala":33,"repara":11,"productos":44,"dias":5,"prodDia":8.8,"baremos":44.5},{"nombre":"Luis Alfonso Torres Millaquen","agencia":"Punta Arenas","ordenes":31,"instala":23,"repara":19,"productos":42,"dias":8,"prodDia":5.3,"baremos":43.7},{"nombre":"Carlos Alfonso Pinto Aguilar","agencia":"Punta Arenas","ordenes":26,"instala":28,"repara":14,"productos":42,"dias":8,"prodDia":5.3,"baremos":40.9},{"nombre":"Gonzalo Rodrigo Carcamo Maldonado","agencia":"Punta Arenas","ordenes":27,"instala":21,"repara":17,"productos":38,"dias":8,"prodDia":4.8,"baremos":37.5},{"nombre":"Juan Carlos Ulloa Moraga","agencia":"Punta Arenas","ordenes":24,"instala":26,"repara":13,"productos":39,"dias":8,"prodDia":4.9,"baremos":36.9},{"nombre":"Eduardo Andres Witto Mansilla","agencia":"Punta Arenas","ordenes":32,"instala":6,"repara":29,"productos":35,"dias":8,"prodDia":4.4,"baremos":36},{"nombre":"Felipe Antonio Rios Cifuentes","agencia":"Punta Arenas","ordenes":13,"instala":6,"repara":9,"productos":15,"dias":3,"prodDia":5,"baremos":16}]};
+const DATA = {"periodo":"Septiembre 2026","generadoEl":"11-09-2026, 10:04:27 a. m.","meta":5,"kpis":{"productos":959,"tecnicos":20,"ordenes":638,"prodDia":6.4},"agencias":[{"agencia":"Punta Arenas","tecnicos":17,"ordenes":539,"instala":479,"repara":295,"productos":774,"prodDia":6.1},{"agencia":"Coyhaique","tecnicos":3,"ordenes":99,"instala":157,"repara":28,"productos":185,"prodDia":7.7}],"tecnicos":[{"nombre":"Victor Hugo Barria Almonacid","agencia":"Punta Arenas","ordenes":51,"instala":43,"repara":26,"productos":69,"dias":8,"prodDia":8.6},{"nombre":"Axel Leonardo Alfaro Alvarez","agencia":"Coyhaique","ordenes":36,"instala":58,"repara":9,"productos":67,"dias":8,"prodDia":8.4},{"nombre":"Jose Alexis Barria Almonacid","agencia":"Punta Arenas","ordenes":44,"instala":38,"repara":25,"productos":63,"dias":7,"prodDia":9},{"nombre":"Luis Eduardo Cisternas Oyarzo","agencia":"Coyhaique","ordenes":31,"instala":50,"repara":10,"productos":60,"dias":8,"prodDia":7.5},{"nombre":"Julio Lopez Cortes","agencia":"Coyhaique","ordenes":32,"instala":49,"repara":9,"productos":58,"dias":8,"prodDia":7.3},{"nombre":"Marcos Alejandro Aguilar Roa","agencia":"Punta Arenas","ordenes":34,"instala":37,"repara":17,"productos":54,"dias":8,"prodDia":6.8},{"nombre":"Egon Rodrigo Villarroel Zuniga","agencia":"Punta Arenas","ordenes":30,"instala":43,"repara":8,"productos":51,"dias":8,"prodDia":6.4},{"nombre":"Miguel Alejandro Alvarado Vivar","agencia":"Punta Arenas","ordenes":33,"instala":34,"repara":17,"productos":51,"dias":8,"prodDia":6.4},{"nombre":"Luis Alfonso Barrientos Munoz","agencia":"Punta Arenas","ordenes":31,"instala":33,"repara":15,"productos":48,"dias":8,"prodDia":6},{"nombre":"Roberto Esteban Diaz Garrido","agencia":"Punta Arenas","ordenes":33,"instala":34,"repara":13,"productos":47,"dias":8,"prodDia":5.9},{"nombre":"Carlos Roberto Saldivia Hernandez","agencia":"Punta Arenas","ordenes":33,"instala":28,"repara":18,"productos":46,"dias":8,"prodDia":5.8},{"nombre":"Rodrigo Eduardo Godoy Carcamo","agencia":"Punta Arenas","ordenes":35,"instala":24,"repara":21,"productos":45,"dias":8,"prodDia":5.6},{"nombre":"Rene Eduardo Mayorga Leuquen","agencia":"Punta Arenas","ordenes":35,"instala":22,"repara":23,"productos":45,"dias":8,"prodDia":5.6},{"nombre":"Gabriel Leonidas Ramirez Ibarra","agencia":"Punta Arenas","ordenes":27,"instala":33,"repara":11,"productos":44,"dias":5,"prodDia":8.8},{"nombre":"Luis Alfonso Torres Millaquen","agencia":"Punta Arenas","ordenes":31,"instala":23,"repara":19,"productos":42,"dias":8,"prodDia":5.3},{"nombre":"Carlos Alfonso Pinto Aguilar","agencia":"Punta Arenas","ordenes":26,"instala":28,"repara":14,"productos":42,"dias":8,"prodDia":5.3},{"nombre":"Juan Carlos Ulloa Moraga","agencia":"Punta Arenas","ordenes":24,"instala":26,"repara":13,"productos":39,"dias":8,"prodDia":4.9},{"nombre":"Gonzalo Rodrigo Carcamo Maldonado","agencia":"Punta Arenas","ordenes":27,"instala":21,"repara":17,"productos":38,"dias":8,"prodDia":4.8},{"nombre":"Eduardo Andres Witto Mansilla","agencia":"Punta Arenas","ordenes":32,"instala":6,"repara":29,"productos":35,"dias":8,"prodDia":4.4},{"nombre":"Felipe Antonio Rios Cifuentes","agencia":"Punta Arenas","ordenes":13,"instala":6,"repara":9,"productos":15,"dias":3,"prodDia":5}]};
 
 document.getElementById('metaRow').innerHTML = 'Periodo: <b>' + DATA.periodo + '</b> &nbsp;&middot;&nbsp; <b>' + DATA.kpis.tecnicos + '</b> tecnicos &nbsp;&middot;&nbsp; Generado ' + DATA.generadoEl;
 document.getElementById('metaTxt').textContent = DATA.meta;
@@ -107,19 +107,17 @@ document.getElementById('footerText').textContent = 'Informe de Produccion COBRA
 var k = DATA.kpis;
 document.getElementById('kpiGrid').innerHTML = [
   '<div class="kpi-card"><div class="label">Productos totales</div><div class="value hl">' + k.productos + '</div><div class="sub">' + k.ordenes + ' ordenes</div></div>',
-  '<div class="kpi-card"><div class="label">Puntos baremo</div><div class="value">' + k.baremos + '</div><div class="sub">total del periodo</div></div>',
+  '<div class="kpi-card"><div class="label">Tecnicos</div><div class="value">' + k.tecnicos + '</div><div class="sub">con produccion en el periodo</div></div>',
   '<div class="kpi-card"><div class="label">Productos / dia</div><div class="value">' + (k.prodDia == null ? '-' : k.prodDia) + '</div><div class="sub">promedio por tecnico &middot; meta ' + DATA.meta + '</div></div>',
-  '<div class="kpi-card"><div class="label">Baremo / dia</div><div class="value">' + (k.barDia == null ? '-' : k.barDia) + '</div><div class="sub">promedio por tecnico</div></div>',
 ].join('');
 
 // ---- Tabla por agencia ----
 (function () {
-  var head = '<tr><th>Agencia</th><th>Tecnicos</th><th>Ordenes</th><th>Instala</th><th>Repara</th><th>Total prod.</th><th>Prod/dia</th><th>Puntos baremo</th><th>Baremo/dia</th></tr>';
+  var head = '<tr><th>Agencia</th><th>Tecnicos</th><th>Ordenes</th><th>Instala</th><th>Repara</th><th>Total prod.</th><th>Prod/dia</th></tr>';
   var rows = DATA.agencias.map(function (a) {
     var pc = a.prodDia == null ? '' : (a.prodDia >= DATA.meta ? 'val-ok' : 'val-bad');
     return '<tr><td class="ag">' + a.agencia + '</td><td>' + a.tecnicos + '</td><td>' + a.ordenes + '</td><td>' + a.instala + '</td><td>' + a.repara + '</td>'
-      + '<td class="b">' + a.productos + '</td><td class="' + pc + '">' + (a.prodDia == null ? '-' : a.prodDia) + '</td>'
-      + '<td class="b">' + a.baremos + '</td><td>' + (a.barDia == null ? '-' : a.barDia) + '</td></tr>';
+      + '<td class="b">' + a.productos + '</td><td class="' + pc + '">' + (a.prodDia == null ? '-' : a.prodDia) + '</td></tr>';
   }).join('');
   document.getElementById('tablaAgencia').innerHTML = head + rows;
 })();
@@ -136,9 +134,8 @@ document.getElementById('kpiGrid').innerHTML = [
     { th: 'Total prod.', key: 'productos', type: 'n' },
     { th: 'Dias', key: 'dias', type: 'n' },
     { th: 'Prod/dia', key: 'prodDia', type: 'n' },
-    { th: 'Puntos baremo', key: 'baremos', type: 'n' },
   ];
-  var sortKey = 'baremos', sortDir = -1; // -1 = mayor a menor, 1 = menor a mayor
+  var sortKey = 'productos', sortDir = -1; // -1 = mayor a menor, 1 = menor a mayor
   var tabla = document.getElementById('tablaTecnicos');
 
   function tipoDe(k) { for (var i = 0; i < cols.length; i++) if (cols[i].key === k) return cols[i].type; return 'n'; }
@@ -165,7 +162,7 @@ document.getElementById('kpiGrid').innerHTML = [
       var pc = t.prodDia == null ? '' : (t.prodDia >= DATA.meta ? 'val-ok' : 'val-bad');
       return '<tr><td>' + (i + 1) + '</td><td>' + t.nombre + '</td><td class="ag">' + t.agencia + '</td><td>' + t.ordenes + '</td>'
         + '<td>' + t.instala + '</td><td>' + t.repara + '</td><td class="b">' + t.productos + '</td><td>' + t.dias + '</td>'
-        + '<td class="' + pc + '">' + (t.prodDia == null ? '-' : t.prodDia) + '</td><td class="b">' + t.baremos + '</td></tr>';
+        + '<td class="' + pc + '">' + (t.prodDia == null ? '-' : t.prodDia) + '</td></tr>';
     }).join('');
     tabla.innerHTML = head + rows;
     Array.prototype.forEach.call(tabla.querySelectorAll('th.sortable'), function (th) {
@@ -180,19 +177,19 @@ document.getElementById('kpiGrid').innerHTML = [
   render();
 })();
 
-// ---- Chart: top 10 por puntos baremo ----
+// ---- Chart: top 10 por productos totales ----
 (function () {
-  var top = DATA.tecnicos.slice(0, 10);
+  var top = DATA.tecnicos.slice().sort(function (a, b) { return b.productos - a.productos; }).slice(0, 10);
   new Chart(document.getElementById('chartTop'), {
     type: 'bar',
     data: {
       labels: top.map(function (t) { return t.nombre; }),
-      datasets: [{ label: 'Puntos baremo', data: top.map(function (t) { return t.baremos; }), backgroundColor: 'rgba(0,113,206,0.85)', borderRadius: 6, maxBarThickness: 34 }],
+      datasets: [{ label: 'Productos totales', data: top.map(function (t) { return t.productos; }), backgroundColor: 'rgba(0,113,206,0.85)', borderRadius: 6, maxBarThickness: 34 }],
     },
     options: {
       indexAxis: 'y', responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false } },
-      scales: { x: { title: { display: true, text: 'Puntos baremo' }, grid: { color: 'rgba(20,50,80,0.06)' } } },
+      scales: { x: { title: { display: true, text: 'Productos totales' }, grid: { color: 'rgba(20,50,80,0.06)' } } },
     },
   });
 })();
