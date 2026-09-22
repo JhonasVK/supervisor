@@ -27,7 +27,7 @@
     jbaez:       '4c444b9fe4bb2ece193c6ddafadca08b0c1e226cc087fc171f68c2e33544baf1',
     cquiroz:     '790cc118f6e5c7a78b7b4016feb1212978f42fb048f05634373b9e7cb8c24ccb',
     fflores:     'bc541b07a9bb72311d725b4e847b811c1286f1aa3aeba5c1ad50773a53d48e0c',
-    eganzalez:   'd3da32e7a49252f3471d5d29c05d92f0160acfcaa86818b7957d25497592c2cd'
+    egonzalez:   '8d46510246affb8a24b5235f7e2153d2368af3870e31183b97083a334fe94d69'
   };
 
   function ocultar()  { try { document.documentElement.style.visibility = 'hidden'; } catch (e) {} }
