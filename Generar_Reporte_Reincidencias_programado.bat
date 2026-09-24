@@ -2,6 +2,8 @@
 setlocal
 cd /d "%~dp0"
 
+set "REG=C:\Bases_Tigo\registrar_estado.js"
+
 where node >nul 2>nul
 if errorlevel 1 (
     echo No se encontro Node.js instalado en este equipo.
@@ -14,6 +16,7 @@ node generar_reincidencias.js
 if errorlevel 1 (
     echo Ocurrio un error generando el informe de Repetido Reparado.
     msg "%USERNAME%" "Informes COBRA: fallo generando Repetido Reparado. Revisa log_reportes.txt"
+    node "%REG%" reportes ERROR "fallo generando Repetido Reparado"
     exit /b 1
 )
 
@@ -23,6 +26,7 @@ node generar_infancia.js
 if errorlevel 1 (
     echo Ocurrio un error generando el informe de Averias de Infancia.
     msg "%USERNAME%" "Informes COBRA: fallo generando Averias de Infancia. Revisa log_reportes.txt"
+    node "%REG%" reportes ERROR "fallo generando Averias de Infancia"
     exit /b 1
 )
 
@@ -46,6 +50,7 @@ node generar_produccion.js
 if errorlevel 1 (
     echo Ocurrio un error generando el informe de Produccion.
     msg "%USERNAME%" "Informes COBRA: fallo generando Produccion. Revisa log_reportes.txt"
+    node "%REG%" reportes ERROR "fallo generando Produccion"
     exit /b 1
 )
 
@@ -55,6 +60,7 @@ node generar_indice.js
 if errorlevel 1 (
     echo Ocurrio un error generando el indice.
     msg "%USERNAME%" "Informes COBRA: fallo generando el indice. Revisa log_reportes.txt"
+    node "%REG%" reportes ERROR "fallo generando el indice"
     exit /b 1
 )
 
@@ -66,6 +72,7 @@ if errorlevel 1 (
     echo Ocurrio un error generando el Portal de Tecnicos.
     popd
     msg "%USERNAME%" "Informes COBRA: fallo generando el Portal de Tecnicos. Revisa log_reportes.txt"
+    node "%REG%" reportes ERROR "fallo generando el Portal de Tecnicos"
     exit /b 1
 )
 popd
@@ -79,6 +86,7 @@ git --version >nul 2>&1
 if errorlevel 1 (
     echo No se encontro Git instalado. Los informes se generaron localmente pero no se publicaron.
     msg "%USERNAME%" "Informes COBRA: se generaron pero no se publicaron (falta Git)."
+    node "%REG%" reportes ERROR "se generaron pero no se publicaron (falta Git)"
     exit /b 0
 )
 
@@ -128,6 +136,8 @@ echo.
 if "%FALLO_SUPERVISOR%%FALLO_PORTAL%"=="00" (
     echo Listo! Informes actualizados y publicados en los dos repos.
     msg "%USERNAME%" "Informes COBRA: se actualizaron y publicaron correctamente (Supervisor + Portal Tecnicos)."
+    node "%REG%" reportes OK "Supervisor y Portal Tecnicos publicados en GitHub"
 ) else (
     msg "%USERNAME%" "Informes COBRA: fallo al publicar (Supervisor=%FALLO_SUPERVISOR% Portal=%FALLO_PORTAL%). Revisa log_reportes.txt"
+    node "%REG%" reportes ERROR "fallo al publicar (Supervisor=%FALLO_SUPERVISOR% Portal=%FALLO_PORTAL%)"
 )
