@@ -5,6 +5,7 @@
 const fs = require('fs');
 const path = require('path');
 const ExcelJS = require('exceljs');
+const { execFileSync } = require('child_process');
 
 const carpeta = __dirname;
 const carpetaBbdd = path.join(carpeta, 'bbdd');
@@ -44,15 +45,35 @@ fs.writeFileSync(
 );
 console.log('meses.json generado:', mesesReincidencias.length, 'meses de reincidencias,', mesesInfancia.length, 'meses de infancia');
 
+// Formato corto y comun a todas las tarjetas: 29-09-2026 13:06
+function fmtFecha(d) {
+  const p = (n) => String(n).padStart(2, '0');
+  return `${p(d.getDate())}-${p(d.getMonth() + 1)}-${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
 function fechaArchivo(nombre) {
   const p = path.join(carpeta, nombre);
   if (!fs.existsSync(p)) return null;
-  return fs.statSync(p).mtime.toLocaleString('es-CL');
+  return fmtFecha(fs.statSync(p).mtime);
+}
+
+// Sitios externos: fecha del ultimo commit que publico su index.html en el repo local.
+// El indice se genera despues de que esos sitios se publican en la manana
+// (Auditorias TIGO 08:50, Informe NPS 10:00; este indice corre tras la MFT de las 11:00).
+function fechaPublicacion(repoDir) {
+  try {
+    const iso = execFileSync('git', ['-C', repoDir, 'log', '-1', '--format=%cI', '--', 'index.html'], { encoding: 'utf8' }).trim();
+    return iso ? fmtFecha(new Date(iso)) : null;
+  } catch (e) {
+    return null;
+  }
 }
 
 const actualizadoReincidencias = fechaArchivo('Dashboard_Reincidencias.html');
 const actualizadoInfancia = fechaArchivo('Dashboard_Infancia.html');
 const actualizadoProduccion = fechaArchivo('Dashboard_Produccion.html');
+const actualizadoAuditorias = fechaPublicacion('C:\\Bases_Tigo\\dashboard-auditorias-tigo');
+const actualizadoNps = fechaPublicacion('C:\\Bases_Tigo\\NPS\\informe-nps');
 
 // ---------- Resumen por agencia (panel superior, solo lo ve el supervisor) ----------
 
@@ -375,14 +396,14 @@ const html = `<!DOCTYPE html>
       icono: '🧾',
       titulo: 'Auditorias de Terreno',
       descripcion: 'Dashboard de auditorias en terreno: nota promedio por tecnico, top hallazgos e incumplimientos por supervisor.',
-      nota: 'Sitio externo',
+      nota: `Sitio externo${actualizadoAuditorias ? ` &nbsp;•&nbsp; Actualizado: ${actualizadoAuditorias}` : ''}`,
     })}
     ${tarjetaExterna({
       href: 'https://jhonasvk.github.io/informe-nps/',
       icono: '⭐',
       titulo: 'Informe NPS',
       descripcion: 'Net Promoter Score de las intervenciones tecnicas: evolucion diaria/semanal, desglose por zona y ranking de tecnicos.',
-      nota: 'Sitio externo',
+      nota: `Sitio externo${actualizadoNps ? ` &nbsp;•&nbsp; Actualizado: ${actualizadoNps}` : ''}`,
     })}
   </div>
 </main>
