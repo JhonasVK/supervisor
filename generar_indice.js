@@ -247,12 +247,15 @@ function tarjeta({ href, disponible, titulo, descripcion, meta, actualizado, mes
   </a>`;
 }
 
-function tarjetaExterna({ href, icono, titulo, descripcion, nota }) {
+// La fecha de un sitio externo se muestra primero con el valor del momento en que se
+// genero este indice y, al abrir la pagina, se reemplaza por la que el sitio publica
+// en su actualizado.txt (asi no queda atrasada si el sitio se publico despues).
+function tarjetaExterna({ href, icono, titulo, descripcion, actualizado }) {
   return `<a class="card" href="${href}" target="_blank" rel="noopener">
     <div class="card-icon">${icono}</div>
     <h2>${titulo}</h2>
     <p>${descripcion}</p>
-    <div class="card-meta">${nota}</div>
+    <div class="card-meta">Sitio externo &nbsp;•&nbsp; Actualizado: <span class="fecha-viva" data-url="${href}actualizado.txt">${actualizado || '—'}</span></div>
     <div class="card-cta">Ver informe &rarr;</div>
   </a>`;
 }
@@ -396,19 +399,26 @@ const html = `<!DOCTYPE html>
       icono: '🧾',
       titulo: 'Auditorias de Terreno',
       descripcion: 'Dashboard de auditorias en terreno: nota promedio por tecnico, top hallazgos e incumplimientos por supervisor.',
-      nota: `Sitio externo${actualizadoAuditorias ? ` &nbsp;•&nbsp; Actualizado: ${actualizadoAuditorias}` : ''}`,
+      actualizado: actualizadoAuditorias,
     })}
     ${tarjetaExterna({
       href: 'https://jhonasvk.github.io/informe-nps/',
       icono: '⭐',
       titulo: 'Informe NPS',
       descripcion: 'Net Promoter Score de las intervenciones tecnicas: evolucion diaria/semanal, desglose por zona y ranking de tecnicos.',
-      nota: `Sitio externo${actualizadoNps ? ` &nbsp;•&nbsp; Actualizado: ${actualizadoNps}` : ''}`,
+      actualizado: actualizadoNps,
     })}
   </div>
 </main>
 
 <script>
+// Fecha en vivo de los sitios externos (Auditorias TIGO, Informe NPS)
+document.querySelectorAll('.fecha-viva').forEach(function (el) {
+  fetch(el.dataset.url, { cache: 'no-store' })
+    .then(function (r) { return r.ok ? r.text() : ''; })
+    .then(function (t) { t = (t || '').trim(); if (/^\\d{2}-\\d{2}-\\d{4} \\d{2}:\\d{2}$/.test(t)) el.textContent = t; })
+    .catch(function () {});
+});
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
 }
