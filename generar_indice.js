@@ -1,3 +1,4 @@
+// Formato visual: sistema de diseno de la Academia Tecnica (azul marino + ambar).
 // Genera index.html: pagina de indice con acceso a los dos informes
 // (Repetido Reparado / Averias de Infancia). Se regenera cada vez que
 // corre Generar_Reporte_Reincidencias.bat, despues de los otros dos scripts.
@@ -224,7 +225,7 @@ function panelResumen(resumen) {
   const periodo = (prod && prod.periodo) || (nps && nps.periodo) || '';
   return '<section class="kpi-panel">'
     + '<div class="kpi-panel-head">Resumen por agencia' + (periodo ? ' &middot; ' + periodo : '') + '</div>'
-    + '<div class="kpi-cols">' + tablaProd + tablaCalidad + '</div>'
+    + '<div class="kpi-cols"><div class="kpi-scroll">' + tablaProd + '</div><div class="kpi-scroll">' + tablaCalidad + '</div></div>'
     + '<div class="kpi-note">"Total P.A." = Punta Arenas + Coyhaique como una sola agencia. Produccion: promedio del mes por tecnico &middot; promedio por dia trabajado (meta ' + META_PRODUCTIVIDAD + '/dia). Metas: Repetido Reparado &le;4% &middot; Infancia &le;2.5% &middot; NPS &ge;' + npsMeta + '%</div>'
     + '</section>';
 }
@@ -232,14 +233,14 @@ function panelResumen(resumen) {
 function tarjeta({ href, disponible, titulo, descripcion, meta, actualizado, meses }) {
   if (!disponible) {
     return `<div class="card disabled">
-      <div class="card-icon">📄</div>
+      <div class="card-icon">Informe</div>
       <h2>${titulo}</h2>
       <p>${descripcion}</p>
       <div class="card-meta">Aun no generado</div>
     </div>`;
   }
   return `<a class="card" href="${href}">
-    <div class="card-icon">📊</div>
+    <div class="card-icon">Informe</div>
     <h2>${titulo}</h2>
     <p>${descripcion}</p>
     <div class="card-meta">Meta: ${meta} &nbsp;•&nbsp; ${meses} mes${meses === 1 ? '' : 'es'} de historial &nbsp;•&nbsp; Actualizado: ${actualizado}</div>
@@ -252,7 +253,7 @@ function tarjeta({ href, disponible, titulo, descripcion, meta, actualizado, mes
 // en su actualizado.txt (asi no queda atrasada si el sitio se publico despues).
 function tarjetaExterna({ href, icono, titulo, descripcion, actualizado }) {
   return `<a class="card" href="${href}" target="_blank" rel="noopener">
-    <div class="card-icon">${icono}</div>
+    <div class="card-icon">Sitio externo</div>
     <h2>${titulo}</h2>
     <p>${descripcion}</p>
     <div class="card-meta">Sitio externo &nbsp;•&nbsp; Actualizado: <span class="fecha-viva" data-url="${href}actualizado.txt">${actualizado || '—'}</span></div>
@@ -276,7 +277,7 @@ const html = `<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Supervisor · COBRA</title>
-<meta name="theme-color" content="#003c71">
+<meta name="theme-color" content="#003575">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -285,89 +286,162 @@ const html = `<!DOCTYPE html>
 <meta name="apple-mobile-web-app-title" content="Supervisor">
 <script>try{if(!sessionStorage.getItem('supAuth_v1'))document.documentElement.style.visibility='hidden'}catch(e){}</script>
 <script src="auth.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@200;300;400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
+/* Formato de la Academia Tecnica (ver diseno-academia.json): azul marino + ambar,
+     esquinas rectas, titulos livianos con la palabra clave en negrita. */
   :root{
-    --bg:#eef1f4; --panel:#ffffff; --border:#e0e5ea; --text:#22303f; --text-dim:#6b7a8c;
-    --cobra-navy:#003c71; --cobra-blue:#0071ce; --celeste:#29a9e0; --celeste-soft:#e8f6fd;
+    color-scheme: light;
+    --navy:#003575; --blue:#3c62ac; --amber:#f0a500;
+    --bg:#f2f2f2; --white:#ffffff; --ink:#334155; --muted:#62646e; --line:#d9dbe0;
+    --ok:#1f7a45; --ok-bg:#e2f1e8; --warn:#9a5b00; --warn-bg:#fdf1d8;
+    --f1:#1f5fbf; --f2:#e0701a; --f3:#2c8a45; --f4:#7a4b2a;
+    --text-dim: var(--muted);
+    --font:"Helvetica Neue","Hanken Grotesk",Helvetica,Arial,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
   }
-  *{box-sizing:border-box;}
-  body{ margin:0; font-family:'Segoe UI', Arial, sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; }
-  header.hero{
-    background:linear-gradient(120deg,#ffffff 0%,var(--celeste-soft) 55%,#dcf1fb 100%);
-    padding:34px 6vw 40px; position:relative; overflow:hidden; border-bottom:4px solid var(--celeste);
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--bg); color:var(--ink); font:400 16px/1.6 var(--font); -webkit-font-smoothing:antialiased; }
+  img{ max-width:100%; }
+  :focus-visible{ outline:2px solid var(--amber); outline-offset:2px; }
+  .wrap{ max-width:1180px; margin:0 auto; padding-inline:24px; }
+  @media (max-width:480px){ .wrap{ padding-inline:16px; } }
+  h1,h2{ text-wrap:balance; margin:0; }
+
+  /* cabecera */
+  header.top{ background:var(--white); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:10; }
+  .brand-row{ display:flex; align-items:center; gap:18px; min-height:72px; padding-block:8px; }
+  .brand-row img{ height:40px; width:auto; display:block; cursor:pointer; }
+  .brand-divider{ width:1px; height:34px; background:var(--line); }
+  .brand-name{ font:300 18px/1.1 var(--font); letter-spacing:.12em; text-transform:uppercase; color:var(--blue); }
+  .brand-name strong{ font-weight:700; color:var(--navy); }
+  @media (max-width:560px){ .brand-row img{ height:30px; } .brand-name{ font-size:14px; } }
+
+  /* portada */
+  .hero{ position:relative; overflow:hidden; color:#ffffff; background:#003575; }
+  .hero .photo{ position:absolute; top:0; right:0; bottom:0; width:74%; background:url("fondo-portada.jpg") 55% 22% / cover no-repeat;
+    -webkit-mask-image:linear-gradient(90deg, transparent 0%, rgba(0,0,0,.35) 25%, rgba(0,0,0,.8) 48%, #000 65%); mask-image:linear-gradient(90deg, transparent 0%, rgba(0,0,0,.35) 25%, rgba(0,0,0,.8) 48%, #000 65%); }
+  .hero .shade{ position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(90deg, #003575 0%, #003575 26%, rgba(0,53,117,.9) 36%, rgba(0,53,117,.68) 46%, rgba(0,53,117,.4) 56%, rgba(0,53,117,.16) 67%, rgba(0,53,117,0) 82%),
+               linear-gradient(0deg, rgba(0,34,77,.5) 0%, rgba(0,34,77,0) 38%); }
+  .hero .fibers{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none;
+    -webkit-mask-image:linear-gradient(90deg, #000 0%, #000 38%, transparent 66%); mask-image:linear-gradient(90deg, #000 0%, #000 38%, transparent 66%); }
+  .hero .fibers path{ fill:none; vector-effect:non-scaling-stroke; }
+  .hero .fibers .strand path{ stroke:rgba(160,195,240,.1); stroke-width:1; }
+  .hero .fibers .pulse{ stroke:rgba(255,190,60,.32); stroke-width:1.3; stroke-linecap:round; stroke-dasharray:70 1500; stroke-dashoffset:1570; }
+  @media (prefers-reduced-motion:no-preference){
+    .hero .fibers .pulse{ animation:pulse 6s linear infinite; }
+    .hero .fibers .p1{ animation-delay:-2s; animation-duration:7s; } .hero .fibers .p2{ animation-delay:-4.5s; animation-duration:6.5s; }
+    .hero .fibers .p3{ animation-delay:-1s; animation-duration:8s; } .hero .fibers .p4{ animation-delay:-5.5s; animation-duration:5.5s; }
+    .hero .fibers .p5{ animation-delay:-3s; animation-duration:7.5s; } .hero .fibers .p6{ animation-delay:-6s; animation-duration:6.8s; }
   }
-  header.hero::after{
-    content:""; position:absolute; right:-100px; top:-100px; width:340px; height:340px; border-radius:50%;
-    background:radial-gradient(circle, rgba(41,169,224,0.18), transparent 70%);
+  @media (prefers-reduced-motion:reduce){ .hero .fibers .pulse{ display:none; } }
+  @keyframes pulse{ from{ stroke-dashoffset:1570; } to{ stroke-dashoffset:0; } }
+  .hero .wrap{ position:relative; display:grid; grid-template-columns:minmax(0,600px); align-content:center; min-height:340px; padding-block:56px 60px; }
+  .eyebrow{ font:600 12px/1.2 var(--font); letter-spacing:.14em; text-transform:uppercase; color:#9fc2f0; margin:0; }
+  .hero h1{ font:200 clamp(38px,5.6vw,64px)/1.05 var(--font); letter-spacing:.01em; margin:16px 0; }
+  .hero h1 b{ font-weight:700; }
+  .subtitle{ color:#c9d7ee; font-size:18px; font-weight:300; max-width:46ch; margin:0; }
+  @media (max-width:860px){
+    .hero .photo{ width:100%; bottom:auto; height:240px; background-position:46% 30%; -webkit-mask-image:none; mask-image:none; }
+    .hero .shade{ background:linear-gradient(180deg, rgba(0,34,77,0) 0%, rgba(0,34,77,0) 90px, rgba(0,53,117,.9) 210px, #003575 240px); }
+    .hero .fibers{ -webkit-mask-image:linear-gradient(180deg, transparent 0, transparent 180px, #000 300px); mask-image:linear-gradient(180deg, transparent 0, transparent 180px, #000 300px); }
+    .hero .wrap{ min-height:0; padding-block:180px 44px; }
   }
-  .brand-row{ display:flex; align-items:center; gap:18px; margin-bottom:22px; }
-  .brand-row img{ height:46px; cursor:pointer; }
-  .easter-toast{ position:fixed; left:50%; bottom:30px; transform:translateX(-50%) translateY(20px); background:var(--cobra-navy); color:#fff; padding:12px 22px; border-radius:30px; font-size:14px; font-weight:700; box-shadow:0 8px 24px rgba(0,60,113,.3); opacity:0; transition:opacity .25s ease, transform .25s ease; z-index:9999; pointer-events:none; white-space:nowrap; }
+
+  /* contenido */
+  main{ padding-block:64px 88px; display:flex; flex-direction:column; gap:72px; }
+  .sec-title{ display:flex; align-items:end; justify-content:space-between; gap:12px 24px; flex-wrap:wrap; margin-bottom:26px; }
+  .sec-title h2{ font:200 32px/1.1 var(--font); color:var(--blue); text-transform:uppercase; letter-spacing:.04em; }
+  .sec-title h2 b{ font-weight:700; color:var(--navy); }
+
+  /* resumen por agencia */
+  .kpi-panel{ background:var(--white); border-top:3px solid var(--navy); padding:clamp(20px,3vw,32px); }
+  .kpi-panel-head{ font:600 12px/1.2 var(--font); letter-spacing:.14em; text-transform:uppercase; color:var(--blue); margin-bottom:18px; }
+  .kpi-cols{ display:grid; grid-template-columns:1fr 1fr; gap:28px 36px; align-items:start; }
+  @media (max-width:860px){ .kpi-cols{ grid-template-columns:1fr; } }
+  .kpi-scroll{ overflow-x:auto; }
+  .kpi-table{ width:100%; border-collapse:collapse; font-size:15px; }
+  .kpi-table th{ background:var(--navy); color:#ffffff; font:600 11px/1.3 var(--font); text-transform:uppercase; letter-spacing:.1em; text-align:right; padding:11px 14px; }
+  .kpi-table th:first-child{ text-align:left; }
+  .kpi-table td{ padding:11px 14px; text-align:right; border-bottom:1px solid var(--line); font:500 14px/1.3 var(--mono); font-variant-numeric:tabular-nums; color:var(--navy); white-space:nowrap; }
+  .kpi-table td.ind{ text-align:left; font:600 15px/1.3 var(--font); color:var(--ink); white-space:normal; }
+  .kpi-table td.ind.sub2{ padding-left:28px; font-weight:400; color:var(--muted); }
+  .kpi-table td.ind .sub{ font-weight:400; color:var(--muted); font-size:12.5px; }
+  .kpi-table td.ok, .kpi-table td .ok{ color:var(--ok) !important; }
+  .kpi-table td.bad, .kpi-table td .bad{ color:var(--warn) !important; }
+  .kpi-table td.ok::after{ content:" ✓"; font-size:12px; }
+  .kpi-table td.bad::after{ content:" ▲"; font-size:10px; }
+  .kpi-table td span{ font-size:12px !important; font-weight:500 !important; margin-left:6px; }
+  .kpi-table td.col-tot{ background:#f7f8fa; border-left:1px solid var(--line); }
+  .kpi-note{ margin-top:18px; font-size:13.5px; color:var(--muted); border-left:3px solid var(--amber); background:var(--warn-bg); padding:10px 14px; }
+
+  /* tarjetas de informes */
+  .cards{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; }
+  @media (max-width:760px){ .cards{ grid-template-columns:1fr; } }
+  .card{ --fc:var(--navy); background:var(--white); border-top:3px solid var(--fc); padding:28px 30px 24px; text-decoration:none; color:inherit; display:flex; flex-direction:column; gap:12px; min-width:0; transition:box-shadow .2s ease; }
+  .card:nth-child(1){ --fc:var(--f1); } .card:nth-child(2){ --fc:var(--f2); } .card:nth-child(3){ --fc:var(--f3); } .card:nth-child(4){ --fc:var(--f4); }
+  a.card:hover{ box-shadow:0 14px 30px -18px rgba(0,53,117,.45); }
+  .card.disabled{ opacity:.55; cursor:default; }
+  .card-icon{ font:600 11.5px/1 var(--font); letter-spacing:.14em; text-transform:uppercase; color:var(--blue); }
+  .card-icon::after{ content:""; display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--fc); margin-left:10px; }
+  .card h2{ font:600 24px/1.2 var(--font); color:var(--navy); }
+  .card p{ margin:0; color:var(--muted); font-size:15px; }
+  .card-meta{ margin-top:auto; padding-top:14px; border-top:1px solid var(--line); font:500 12px/1.5 var(--mono); color:var(--muted); }
+  .card-cta{ color:var(--blue); font-weight:600; font-size:14px; letter-spacing:.06em; text-transform:uppercase; }
+
+  /* pie */
+  footer.foot{ background:var(--navy); color:#c9d7ee; }
+  footer.foot .wrap{ display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:16px; padding-block:28px; }
+  footer.foot img{ height:28px; width:auto; background:#ffffff; padding:5px 10px; display:block; }
+  footer.foot span{ font-weight:300; letter-spacing:.1em; text-transform:uppercase; font-size:12px; }
+  footer.foot .by{ font-size:9px; letter-spacing:.08em; opacity:.85; }
+  footer.foot .by b{ text-transform:none; font-weight:700; color:#ffffff; letter-spacing:.08em; }
+
+  /* easter egg del logo */
+  .easter-toast{ position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(20px); background:#00224d; color:#fff; border-left:3px solid var(--amber); padding:14px 20px; font-size:15px; font-weight:600; box-shadow:0 18px 40px -16px rgba(0,20,50,.6); opacity:0; transition:opacity .25s ease, transform .25s ease; z-index:9999; pointer-events:none; max-width:calc(100vw - 32px); }
   .easter-toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
   .easter-emoji{ position:fixed; font-size:22px; pointer-events:none; z-index:9999; animation:easterFloat 1.1s ease-out forwards; }
   @keyframes easterFloat{ 0%{ transform:translate(0,0) scale(.6); opacity:1; } 100%{ transform:translate(var(--dx),-90px) scale(1.3); opacity:0; } }
-  .easter-game-overlay{ position:fixed; inset:0; background:rgba(10,20,35,.85); z-index:10000; color:#fff; text-align:center; overflow:hidden; }
+  .easter-game-overlay{ position:fixed; inset:0; background:rgba(0,20,50,.9); z-index:10000; color:#fff; text-align:center; overflow:hidden; }
   .easter-game-overlay .eg-cerrar{ position:absolute; top:18px; right:22px; background:none; border:none; color:#fff; font-size:26px; cursor:pointer; }
-  .easter-game-hud{ position:absolute; top:20px; left:22px; font-size:15px; font-weight:700; }
+  .easter-game-hud{ position:absolute; top:20px; left:22px; font-size:15px; font-weight:600; }
   .easter-game-titulo{ position:absolute; top:60px; left:0; right:0; font-size:15px; }
   .easter-star{ position:absolute; width:44px; height:44px; display:flex; align-items:center; justify-content:center; font-size:26px; cursor:pointer; user-select:none; }
-  .easter-game-final{ position:absolute; top:40%; left:50%; transform:translate(-50%,-50%); font-size:20px; font-weight:800; }
-  .easter-game-final button{ margin-top:16px; padding:10px 22px; border-radius:20px; border:none; background:var(--celeste); color:var(--cobra-navy); font-weight:800; cursor:pointer; font-size:14px; }
-  .brand-divider{ width:1px; height:34px; background:var(--border); }
-  .eyebrow{ text-transform:uppercase; letter-spacing:.14em; font-size:12.5px; color:var(--celeste); font-weight:800; }
-  h1{ margin:0 0 6px; font-size:clamp(26px,4vw,38px); font-weight:800; letter-spacing:-0.01em; color:var(--cobra-navy); }
-  .subtitle{ color:#3a4a5c; font-size:15px; max-width:660px; line-height:1.55; }
-  main{ padding:44px 6vw 80px; max-width:1100px; margin:0 auto; }
-  .cards{ display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:22px; }
-  .card{
-    display:block; background:var(--panel); border:1px solid var(--border); border-radius:16px;
-    padding:26px 26px 22px; text-decoration:none; color:inherit; box-shadow:0 10px 24px rgba(20,50,80,.06);
-    transition: transform .15s ease, box-shadow .15s ease;
-  }
-  .card:hover{ transform:translateY(-3px); box-shadow:0 14px 30px rgba(20,50,80,.12); }
-  .card.disabled{ opacity:.55; cursor:default; }
-  .card-icon{ font-size:28px; margin-bottom:10px; }
-  .card h2{ margin:0 0 8px; font-size:19px; color:var(--cobra-navy); }
-  .card p{ margin:0 0 14px; font-size:13.5px; color:var(--text-dim); line-height:1.55; }
-  .card-meta{ font-size:11.5px; color:var(--text-dim); border-top:1px solid var(--border); padding-top:12px; }
-  .card-cta{ margin-top:10px; font-size:13px; font-weight:700; color:var(--celeste); }
-
-  .kpi-panel{ background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:20px 24px 16px; box-shadow:0 10px 24px rgba(20,50,80,.06); margin-bottom:26px; }
-  .kpi-panel-head{ font-size:12px; text-transform:uppercase; letter-spacing:.06em; font-weight:800; color:var(--text-dim); margin-bottom:12px; }
-  .kpi-cols{ display:grid; grid-template-columns:1fr 1fr; gap:30px; align-items:start; }
-  @media (max-width:760px){ .kpi-cols{ grid-template-columns:1fr; } }
-  .kpi-table{ width:100%; border-collapse:collapse; font-size:13.5px; }
-  .kpi-table th{ text-align:right; font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--text-dim); font-weight:800; padding:4px 10px 8px; }
-  .kpi-table th:first-child{ text-align:left; color:var(--cobra-navy); }
-  .kpi-table td{ padding:5px 10px; text-align:right; font-weight:800; color:var(--cobra-navy); white-space:nowrap; }
-  .kpi-table td.ind{ text-align:left; font-weight:600; color:var(--text); }
-  .kpi-table td.ind.sub2{ padding-left:22px; color:var(--text-dim); font-weight:500; }
-  .kpi-table td.ind .sub{ font-weight:400; color:var(--text-dim); font-size:11px; }
-  .kpi-table td.ok{ color:#1fa971; }
-  .kpi-table td.bad{ color:#e2523e; }
-  .kpi-table td .ok{ color:#1fa971; }
-  .kpi-table td .bad{ color:#e2523e; }
-  .kpi-table .col-tot{ border-left:1px solid var(--border); padding-left:14px; background:#f6f9fc; }
-  .kpi-table th.col-tot{ background:transparent; }
-  .kpi-note{ margin-top:12px; font-size:11px; color:var(--text-dim); }
-
-  footer{ text-align:center; padding:26px; color:var(--text-dim); font-size:12px; }
+  .easter-game-final{ position:absolute; top:40%; left:50%; transform:translate(-50%,-50%); font-size:20px; font-weight:700; }
+  .easter-game-final button{ margin-top:16px; padding:12px 22px; border-radius:2px; border:none; background:var(--amber); color:#1d1a12; font-weight:600; cursor:pointer; font-size:14px; }
 </style>
 </head>
 <body>
 
-<header class="hero">
-  <div class="brand-row">
+<header class="top">
+  <div class="wrap brand-row">
     <img src="logo-cobra.png" alt="Cobra">
     <div class="brand-divider"></div>
-    <div class="eyebrow">Calidad &amp; Capacitacion</div>
+    <div class="brand-name">Portal <strong>Supervisor</strong></div>
   </div>
-  <h1>Supervisor</h1>
-  <div class="subtitle">Elige el informe que quieres revisar.</div>
 </header>
 
-<main>
-  ${panelResumen(resumen)}
+<section class="hero" aria-label="Portada">
+  <div class="photo" role="img" aria-label="Tecnico con EPP trabajando en un poste"></div>
+  <div class="shade" aria-hidden="true"></div>
+  <svg class="fibers" viewBox="0 0 1440 600" preserveAspectRatio="none" aria-hidden="true"><g class="strand"><path d="M-20 40 C339 12 744 101 1100 178"/><path d="M-20 76 C364 65 649 188 1100 187"/><path d="M-20 112 C304 107 651 122 1100 196"/><path d="M-20 148 C351 174 660 155 1100 205"/><path d="M-20 184 C375 220 732 195 1100 214"/><path d="M-20 220 C417 184 777 185 1100 223"/><path d="M-20 256 C317 225 689 289 1100 232"/><path d="M-20 292 C322 299 742 218 1100 241"/><path d="M-20 328 C366 293 650 197 1100 250"/><path d="M-20 364 C382 358 690 274 1100 259"/><path d="M-20 400 C354 384 767 304 1100 268"/><path d="M-20 436 C329 442 724 345 1100 277"/><path d="M-20 472 C388 455 797 217 1100 286"/><path d="M-20 508 C350 529 664 293 1100 295"/><path d="M-20 544 C305 557 762 317 1100 304"/><path d="M-20 580 C405 565 751 330 1100 313"/></g><g><path class="pulse p0" d="M-20 112 C304 107 651 122 1100 196"/><path class="pulse p1" d="M-20 292 C322 299 742 218 1100 241"/><path class="pulse p2" d="M-20 472 C388 455 797 217 1100 286"/><path class="pulse p3" d="M-20 40 C339 12 744 101 1100 178"/><path class="pulse p4" d="M-20 184 C375 220 732 195 1100 214"/><path class="pulse p5" d="M-20 364 C382 358 690 274 1100 259"/><path class="pulse p6" d="M-20 544 C305 557 762 317 1100 304"/></g></svg>
+  <div class="wrap"><div>
+    <p class="eyebrow">Calidad &amp; Capacitaci&oacute;n</p>
+    <h1>Portal del <b>Supervisor</b></h1>
+    <p class="subtitle">Elige el informe que quieres revisar.</p>
+  </div></div>
+</section>
+
+<main class="wrap">
+  <section>
+    <div class="sec-title"><h2>Resumen por <b>agencia</b></h2></div>
+    ${panelResumen(resumen)}
+  </section>
+  <section>
+    <div class="sec-title"><h2>Informes <b>disponibles</b></h2></div>
   <div class="cards">
     ${tarjeta({
       href: 'Dashboard_Reincidencias.html',
@@ -388,7 +462,7 @@ const html = `<!DOCTYPE html>
       meses: mesesInfancia.length,
     })}
     ${actualizadoProduccion ? `<a class="card" href="Dashboard_Produccion.html">
-      <div class="card-icon">📊</div>
+      <div class="card-icon">Informe</div>
       <h2>Produccion por tecnicos</h2>
       <p>Produccion por tecnico de Punta Arenas y Coyhaique (INF-09): productos instala/repara, dias trabajados y productos por dia.</p>
       <div class="card-meta">Meta: ${META_PRODUCTIVIDAD}/dia &nbsp;&bull;&nbsp; Actualizado: ${actualizadoProduccion}</div>
@@ -409,7 +483,14 @@ const html = `<!DOCTYPE html>
       actualizado: actualizadoNps,
     })}
   </div>
+  </section>
 </main>
+
+<footer class="foot"><div class="wrap">
+  <img src="logo-cobra.png" alt="Cobra">
+  <span>Portal Supervisor &middot; Calidad &amp; Capacitaci&oacute;n</span>
+  <span class="by">Desarrollado por <b>J.V.Soft...</b> &middot; Construyendo ideas</span>
+</div></footer>
 
 <script>
 // Fecha en vivo de los sitios externos (Auditorias TIGO, Informe NPS)
