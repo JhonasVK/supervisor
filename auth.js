@@ -105,8 +105,64 @@
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
   }
 
+  var FUENTE = '\'Helvetica Neue\',\'Hanken Grotesk\',Helvetica,Arial,sans-serif';
+
+  // En la portada (cabecera blanca) el usuario, Salir y Administrar van dentro de la cabecera,
+  // como en la Academia Técnica. En los informes, que no tienen esa cabecera, quedan flotando.
+  function inyectarBarra(d) {
+    var admin = d.r === 'admin' && !!d.at;
+    var fila = document.querySelector('header.top .brand-row');
+    if (!fila) { inyectarBotonSalir(d.u); if (admin) inyectarBotonIngresos(); return; }
+    if (document.getElementById('supBarra')) return;
+    estilosBotones();
+    fila.style.flexWrap = 'wrap';
+    var barra = document.createElement('div');
+    barra.id = 'supBarra';
+    barra.innerHTML =
+      '<nav class="sup-tabs" aria-label="Secciones"><a href="index.html" aria-current="page">Inicio</a>' +
+        (admin ? '<button type="button" id="supIngresosBtn">Administrar</button>' : '') + '</nav>' +
+      '<div class="sup-who"><span class="me"><b></b><small></small></span><button type="button" id="supLogoutBtn">Salir</button></div>';
+    barra.querySelector('.me b').textContent = d.n || d.u;
+    barra.querySelector('.me small').textContent = d.n ? d.u : '';
+    fila.appendChild(barra);
+    document.getElementById('supLogoutBtn').addEventListener('click', cerrarSesion);
+    if (admin) document.getElementById('supIngresosBtn').addEventListener('click', abrirIngresos);
+  }
+
+  // Botones con el mismo formato de la Academia Técnica (.btn y .btn.primary).
+  function estilosBotones() {
+    if (document.getElementById('supBtnCss')) return;
+    var st = document.createElement('style');
+    st.id = 'supBtnCss';
+    st.textContent =
+      '.sup-btn{border:1px solid #003575;background:#ffffff;color:#003575;padding:12px 20px;border-radius:2px;' +
+        'font:600 14px/1.2 \'Helvetica Neue\',\'Hanken Grotesk\',Helvetica,Arial,sans-serif;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}' +
+      '.sup-btn:hover{background:#f2f5fa}' +
+      '.sup-btn.primary{background:#003575;color:#ffffff}' +
+      '.sup-btn.primary:hover{background:#00428f}' +
+      '.sup-btn.chico{padding:8px 14px;font-size:12px}' +
+      '.sup-btn:disabled{opacity:.55;cursor:default}' +
+      '.sup-btn:focus-visible{outline:2px solid #f0a500;outline-offset:2px}' +
+      // Barra de la cabecera, igual a la de la Academia Técnica (pestañas + usuario + Salir).
+      '#supBarra{margin-left:auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:10px 32px}' +
+      '.sup-tabs{display:flex;gap:4px 26px;flex-wrap:wrap}' +
+      '.sup-tabs a,.sup-tabs button{border:0;background:none;padding:8px 0;font:500 14px/1 ' + FUENTE + ';letter-spacing:.08em;' +
+        'text-transform:uppercase;color:#62646e;border-bottom:2px solid transparent;text-decoration:none;cursor:pointer}' +
+      '.sup-tabs a:hover,.sup-tabs button:hover{color:#003575}' +
+      '.sup-tabs [aria-current="page"]{color:#003575;border-bottom-color:#f0a500}' +
+      '.sup-who{display:flex;align-items:center;gap:14px}' +
+      '.sup-who .me{display:flex;flex-direction:column;line-height:1.25;text-align:right}' +
+      '.sup-who .me b{color:#003575;font:600 14px/1.25 ' + FUENTE + '}' +
+      '.sup-who .me small{font:500 11px/1.3 "IBM Plex Mono",ui-monospace,Consolas,monospace;color:#62646e}' +
+      '.sup-who button{border:1px solid #d9dbe0;background:#ffffff;color:#003575;padding:7px 12px;border-radius:2px;' +
+        'font:600 11px/1 ' + FUENTE + ';letter-spacing:.1em;text-transform:uppercase;cursor:pointer}' +
+      '.sup-who button:hover{border-color:#003575}';
+    document.head.appendChild(st);
+  }
+
   function abrirIngresos() {
     if (document.getElementById('supIngresos')) return;
+    estilosBotones();
     var F = '\'Helvetica Neue\',\'Hanken Grotesk\',Helvetica,Arial,sans-serif';
     var ov = document.createElement('div');
     ov.id = 'supIngresos';
@@ -116,8 +172,8 @@
         '<div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;margin-bottom:6px;">' +
           '<h2 id="supIngTit" style="margin:0;font-size:28px;font-weight:200;color:#003575;">Administración del <b style="font-weight:700;">portal</b></h2>' +
           '<div style="display:flex;gap:8px;">' +
-            '<button type="button" id="supIngCsv" disabled style="padding:10px 16px;border:none;border-radius:2px;background:#f0a500;color:#1d1a12;font:600 14px ' + F + ';cursor:pointer;">Descargar ingresos</button>' +
-            '<button type="button" id="supIngCerrar" style="padding:10px 16px;border:1px solid #d9dbe0;border-radius:2px;background:#fff;color:#003575;font:600 14px ' + F + ';cursor:pointer;">Cerrar</button>' +
+            '<button type="button" id="supIngCsv" class="sup-btn primary" disabled>Descargar ingresos</button>' +
+            '<button type="button" id="supIngCerrar" class="sup-btn">Cerrar</button>' +
           '</div></div>' +
         '<h3 style="margin:22px 0 4px;font-size:19px;font-weight:700;color:#003575;">Usuarios y claves</h3>' +
         '<p id="supUsuInfo" style="margin:0 0 14px;font-size:15px;color:#64748b;">Cargando…</p>' +
@@ -180,7 +236,7 @@
           if (x.usuario !== yo) {
             var b = document.createElement('button');
             b.type = 'button'; b.textContent = 'Restablecer';
-            b.style.cssText = 'padding:7px 12px;border:1px solid #003575;border-radius:2px;background:#fff;color:#003575;font:600 13px ' + F + ';cursor:pointer;';
+            b.className = 'sup-btn chico';
             b.addEventListener('click', function () { restablecer(x.usuario, b); });
             td.appendChild(b);
           }
@@ -224,10 +280,11 @@
     b.id = 'supIngresosBtn';
     b.type = 'button';
     b.textContent = 'Administrar';
+    estilosBotones();
     b.style.cssText = [
       'position:fixed', 'top:46px', 'right:12px', 'z-index:2147483646',
-      'background:#003575', 'border:1px solid #003575', 'border-radius:2px',
-      'padding:7px 12px', 'font:600 11px \'Helvetica Neue\',\'Hanken Grotesk\',Helvetica,Arial,sans-serif', 'color:#ffffff',
+      'background:#ffffff', 'border:1px solid #d9dbe0', 'border-radius:2px',
+      'padding:7px 12px', 'font:600 11px \'Helvetica Neue\',\'Hanken Grotesk\',Helvetica,Arial,sans-serif', 'color:#003575',
       'letter-spacing:.1em', 'text-transform:uppercase', 'cursor:pointer'
     ].join(';');
     b.addEventListener('click', abrirIngresos);
@@ -300,8 +357,7 @@
       try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(d)); } catch (e) {}
       ov.remove();
       revelar();
-      inyectarBotonSalir(perfil.usuario);
-      if (perfil.rol === 'admin') inyectarBotonIngresos();
+      inyectarBarra(d);
     }
     var refresco = null, vence = 0;
 
@@ -378,7 +434,7 @@
   var actual = sesion();
   if (actual) {
     revelar();
-    alDOM(function () { inyectarBotonSalir(actual.u); if (actual.r === 'admin' && actual.at) inyectarBotonIngresos(); });
+    alDOM(function () { inyectarBarra(actual); });
   } else {
     ocultar();
     alDOM(construirLogin);
