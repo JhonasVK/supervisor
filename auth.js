@@ -64,9 +64,9 @@
     b.textContent = 'Cerrar sesión' + (usuario ? ' · ' + usuario : '');
     b.style.cssText = [
       'position:fixed', 'top:10px', 'right:12px', 'z-index:2147483646',
-      'background:rgba(255,255,255,.92)', 'border:1px solid #e0e5ea', 'border-radius:20px',
-      'padding:5px 12px', 'font:600 11.5px \'Segoe UI\',Arial,sans-serif', 'color:#003c71',
-      'cursor:pointer', 'box-shadow:0 2px 8px rgba(20,50,80,.12)'
+      'background:#ffffff', 'border:1px solid #d9dbe0', 'border-radius:2px',
+      'padding:7px 12px', 'font:600 11px \'Helvetica Neue\',\'Hanken Grotesk\',Helvetica,Arial,sans-serif', 'color:#003575',
+      'letter-spacing:.1em', 'text-transform:uppercase', 'cursor:pointer'
     ].join(';');
     b.addEventListener('click', cerrarSesion);
     document.body.appendChild(b);
@@ -78,27 +78,29 @@
     ov.id = 'supLoginOverlay';
     ov.style.cssText = [
       'visibility:visible', 'position:fixed', 'inset:0', 'z-index:2147483647',
-      'background:linear-gradient(120deg,#eef1f4 0%,#e8f6fd 55%,#dcf1fb 100%)',
+      'background:linear-gradient(90deg,rgba(0,53,117,.96) 0%,rgba(0,53,117,.9) 40%,rgba(0,53,117,.55) 100%),url(fondo-portada.jpg) 55% 25%/cover no-repeat #003575',
       'display:flex', 'align-items:center', 'justify-content:center', 'padding:20px',
-      'font-family:\'Segoe UI\',Arial,sans-serif'
+      'font-family:\'Helvetica Neue\',\'Hanken Grotesk\',Helvetica,Arial,sans-serif'
     ].join(';');
+    var LBL = 'display:block;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#c9d7ee;margin-bottom:7px;';
+    var INP = 'width:100%;padding:13px 14px;border:1px solid rgba(255,255,255,.3);border-radius:2px;background:rgba(255,255,255,.95);color:#334155;font-size:17px;font-family:inherit;';
     ov.innerHTML =
-      '<form id="supLoginForm" autocomplete="on" style="background:#fff;padding:32px 30px;border-radius:16px;' +
-        'box-shadow:0 20px 50px rgba(0,60,113,.18);width:min(92vw,360px);">' +
-        '<div style="font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:#29a9e0;font-weight:800;">Calidad &amp; Capacitacion</div>' +
-        '<h1 style="margin:4px 0 2px;font-size:24px;color:#003c71;font-weight:800;">Supervisor</h1>' +
-        '<p style="margin:0 0 20px;font-size:13px;color:#6b7a8c;line-height:1.5;">Ingresa tus credenciales para ver los informes.</p>' +
-        '<label for="supU" style="display:block;font-size:12px;font-weight:700;color:#22303f;margin-bottom:4px;">Usuario</label>' +
+      '<form id="supLoginForm" autocomplete="on" style="background:rgba(0,34,77,.6);padding:34px 30px 30px;border:1px solid rgba(255,255,255,.18);' +
+        'border-top:3px solid #f0a500;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);width:min(92vw,420px);color:#fff;">' +
+        '<div style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#9fc2f0;font-weight:600;">Calidad &amp; Capacitaci&oacute;n</div>' +
+        '<h1 style="margin:12px 0 8px;font-size:34px;line-height:1.1;color:#fff;font-weight:200;">Portal del <b style="font-weight:700;">Supervisor</b></h1>' +
+        '<p style="margin:0 0 24px;font-size:16px;color:#c9d7ee;font-weight:300;line-height:1.5;">Ingresa tus credenciales para ver los informes.</p>' +
+        '<label for="supU" style="' + LBL + '">Usuario</label>' +
         '<input id="supU" name="username" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" ' +
-          'style="width:100%;padding:10px 12px;border:1px solid #e0e5ea;border-radius:9px;font-size:14px;margin-bottom:14px;">' +
-        '<label for="supP" style="display:block;font-size:12px;font-weight:700;color:#22303f;margin-bottom:4px;">Clave</label>' +
+          'style="' + INP + 'margin-bottom:18px;">' +
+        '<label for="supP" style="' + LBL + '">Clave</label>' +
         '<input id="supP" name="password" type="password" autocomplete="current-password" ' +
-          'style="width:100%;padding:10px 12px;border:1px solid #e0e5ea;border-radius:9px;font-size:14px;margin-bottom:8px;">' +
-        '<div id="supErr" role="alert" style="min-height:18px;font-size:12.5px;color:#c0392b;margin-bottom:8px;"></div>' +
-        '<button type="submit" id="supBtn" style="width:100%;padding:11px;border:none;border-radius:9px;background:#0071ce;' +
-          'color:#fff;font-size:14px;font-weight:800;cursor:pointer;">Entrar</button>' +
+          'style="' + INP + 'margin-bottom:10px;">' +
+        '<div id="supErr" role="alert" style="min-height:20px;font-size:14px;color:#ffe2a8;margin-bottom:10px;"></div>' +
+        '<button type="submit" id="supBtn" style="width:100%;padding:14px 22px;border:none;border-radius:2px;background:#f0a500;' +
+          'color:#1d1a12;font-size:16px;font-weight:600;font-family:inherit;cursor:pointer;">Ingresar &rarr;</button>' +
       '</form>' +
-      '<img src="logo-cobra-t.png" alt="Cobra" style="position:absolute;top:22px;left:26px;height:34px;width:auto;">';
+      '<img src="logo-cobra.png" alt="Cobra" style="position:absolute;top:18px;left:22px;height:40px;width:auto;background:#fff;padding:6px 12px;">';
     document.body.appendChild(ov);
 
     var form = document.getElementById('supLoginForm');

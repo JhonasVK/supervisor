@@ -133,19 +133,22 @@ function plantilla(json) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Informe de Produccion · COBRA</title>
-<meta name="theme-color" content="#003c71">
+<meta name="theme-color" content="#003575">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <script>try{if(!sessionStorage.getItem('supAuth_v1'))document.documentElement.style.visibility='hidden'}catch(e){}<\/script>
 <script src="auth.js"><\/script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"><\/script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@200;300;400;500;600;700&display=swap">
 <style>
-  :root{ --bg:#eef1f4; --panel:#fff; --panel-2:#f5f7f9; --border:#e0e5ea; --text:#22303f; --text-dim:#6b7a8c;
-    --cobra-navy:#003c71; --cobra-blue:#0071ce; --celeste:#29a9e0; --celeste-soft:#e8f6fd; --promotor:#1fa971; --neutro:#e2962e; --detractor:#e2523e; }
+  :root{ --bg:#f2f2f2; --panel:#fff; --panel-2:#f7f8fa; --border:#d9dbe0; --text:#334155; --text-dim:#62646e;
+    --cobra-navy:#003575; --cobra-blue:#3c62ac; --celeste:#3c62ac; --celeste-soft:#eef2f9; --promotor:#1f7a45; --neutro:#c77700; --detractor:#c0392b; }
   *{box-sizing:border-box;}
   body{ margin:0; font-family:'Segoe UI', Arial, sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; }
-  header.hero{ background:linear-gradient(120deg,#fff 0%,var(--celeste-soft) 55%,#dcf1fb 100%); padding:34px 6vw 40px; position:relative; overflow:hidden; border-bottom:4px solid var(--celeste); }
-  header.hero::after{ content:""; position:absolute; right:-100px; top:-100px; width:340px; height:340px; border-radius:50%; background:radial-gradient(circle, rgba(41,169,224,0.18), transparent 70%); }
+  header.hero{ background:linear-gradient(120deg,#fff 0%,var(--celeste-soft) 55%,#e3e9f4 100%); padding:34px 6vw 40px; position:relative; overflow:hidden; border-bottom:4px solid var(--celeste); }
+  header.hero::after{ content:""; position:absolute; right:-100px; top:-100px; width:340px; height:340px; border-radius:50%; background:radial-gradient(circle, rgba(60,98,172,0.18), transparent 70%); }
   .back-link{ display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:var(--cobra-navy); text-decoration:none; margin-bottom:14px; }
   .back-link:hover{ text-decoration:underline; }
   .brand-row{ display:flex; align-items:center; gap:18px; margin-bottom:22px; }
@@ -165,7 +168,7 @@ function plantilla(json) {
   .kpi-card .sub{ font-size:12px; color:var(--text-dim); margin-top:6px; }
   section{ margin-bottom:44px; }
   .section-title{ display:flex; align-items:baseline; gap:10px; margin-bottom:6px; }
-  .section-title .num{ font-size:13px; font-weight:800; color:var(--celeste); background:rgba(41,169,224,0.12); border:1px solid rgba(41,169,224,.35); border-radius:6px; padding:2px 8px; }
+  .section-title .num{ font-size:13px; font-weight:800; color:var(--celeste); background:rgba(60,98,172,0.12); border:1px solid rgba(60,98,172,.35); border-radius:6px; padding:2px 8px; }
   .section-title h2{ margin:0; font-size:20px; font-weight:750; color:var(--cobra-navy); }
   .section-desc{ color:var(--text-dim); font-size:13.5px; margin:0 0 18px; max-width:820px; line-height:1.55; }
   .panel{ background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:22px 24px 14px; box-shadow:0 4px 14px rgba(20,50,80,.05); }
@@ -187,6 +190,64 @@ function plantilla(json) {
   .val-bad{ color:var(--detractor); font-weight:800; }
   footer{ text-align:center; padding:26px; color:var(--text-dim); font-size:12px; border-top:1px solid var(--border); }
   canvas{ max-width:100%; }
+
+  /* ================= Formato Academia Tecnica (ver diseno-academia.json) =================
+     Azul marino + ambar, esquinas rectas, titulos livianos, tablas con encabezado marino. */
+  body{ font-family:"Helvetica Neue","Hanken Grotesk",Helvetica,Arial,sans-serif; font-size:15px; line-height:1.55; }
+  header.hero{
+    background:linear-gradient(90deg,#003575 0%,#003575 34%,rgba(0,53,117,.84) 52%,rgba(0,53,117,.38) 74%,rgba(0,53,117,.12) 100%),
+               url("fondo-portada.jpg") 70% 24% / cover no-repeat #003575;
+    border-bottom:0; padding:40px 6vw 78px; color:#ffffff;
+  }
+  header.hero::after{ display:none; }
+  .brand-row img{ background:#ffffff; padding:6px 12px; height:44px; }
+  .brand-divider{ background:rgba(255,255,255,.3); }
+  .eyebrow{ color:#9fc2f0; font-weight:600; font-size:12px; }
+  h1{ color:#ffffff; font-weight:200; font-size:clamp(32px,4.6vw,52px); letter-spacing:.01em; line-height:1.08; margin-bottom:10px; }
+  .subtitle{ color:#c9d7ee; font-weight:300; font-size:17px; }
+  .meta-row{ color:#c9d7ee; }
+  .meta-row b, .meta-row span b{ color:#ffffff; }
+  .back-link{ color:#ffffff; font-weight:600; letter-spacing:.1em; text-transform:uppercase; font-size:12px; }
+  .archive-row .archive-label{ color:#9fc2f0; }
+  .archive-pill{ border-radius:2px; border-color:rgba(255,255,255,.4); background:transparent; color:#ffffff; font-weight:600; }
+  .archive-pill:hover{ background:rgba(255,255,255,.14); }
+  .archive-pill.current{ background:#f0a500; border-color:#f0a500; color:#1d1a12; }
+
+  .kpi-card{ border:0; border-top:3px solid #003575; border-radius:0; box-shadow:0 14px 30px -22px rgba(0,53,117,.55); }
+  .kpi-card .label{ font-weight:600; letter-spacing:.1em; font-size:11px; }
+  .kpi-card .value{ font-weight:200; font-size:40px; font-variant-numeric:tabular-nums; }
+
+  .section-title{ align-items:center; margin-bottom:10px; }
+  .section-title .num{ background:#003575; color:#ffffff; border:0; border-radius:0; font-weight:600; padding:4px 9px; }
+  .section-title h2{ font-weight:300; font-size:26px; }
+  .section-desc{ font-size:15px; }
+
+  .panel{ border:0; border-radius:0; box-shadow:none; }
+  table{ font-size:14px; }
+  th{ background:#003575; color:#ffffff; font-weight:600; letter-spacing:.1em; font-size:11px; border-bottom:0; }
+  th.sortable:hover, th.sorted{ color:#ffd27a; }
+  td{ border-bottom:1px solid #d9dbe0; }
+  .badge{ border-radius:0; font-weight:600; letter-spacing:.06em; padding:4px 8px; }
+
+  .callout, .callout.warn{ border-left:3px solid #f0a500; background:#fdf1d8; border-radius:0; color:#334155; }
+  .rec-item{ border-radius:0; border:0; border-left:3px solid #003575; background:#f7f8fa; }
+  .rec-item .idx{ border-radius:0; background:#003575; }
+  .tech-card{ border-radius:0; box-shadow:none; }
+  .tech-quote{ border-radius:0; }
+
+  footer{ background:#003575; color:#c9d7ee; border-top:0; letter-spacing:.1em; text-transform:uppercase; font-weight:300; }
+  .export-pdf-btn{ border-radius:2px; background:#f0a500; color:#1d1a12; box-shadow:none; letter-spacing:.06em; text-transform:uppercase; font-size:12.5px; font-weight:600; }
+  .export-pdf-btn:hover{ background:#ffb61a; transform:none; }
+  .easter-toast{ border-radius:0; border-left:3px solid #f0a500; background:#00224d; }
+  .easter-game-final button{ border-radius:2px; background:#f0a500; color:#1d1a12; }
+
+  @media print{
+    header.hero{ background:#ffffff; color:#334155; border-bottom:2px solid #003575; padding-bottom:20px; }
+    h1{ color:#003575; } .eyebrow{ color:#3c62ac; } .subtitle, .meta-row{ color:#334155; } .meta-row b, .meta-row span b{ color:#003575; }
+    .back-link{ color:#003575; } .brand-row img{ padding:0; }
+    th{ background:#003575 !important; color:#ffffff !important; }
+    footer{ background:#ffffff; color:#62646e; }
+  }
 </style>
 </head>
 <body>
@@ -313,7 +374,7 @@ document.getElementById('kpiGrid').innerHTML = [
     type: 'bar',
     data: {
       labels: top.map(function (t) { return t.nombre; }),
-      datasets: [{ label: 'Productos totales', data: top.map(function (t) { return t.productos; }), backgroundColor: 'rgba(0,113,206,0.85)', borderRadius: 6, maxBarThickness: 34 }],
+      datasets: [{ label: 'Productos totales', data: top.map(function (t) { return t.productos; }), backgroundColor: 'rgba(60,98,172,0.85)', borderRadius: 6, maxBarThickness: 34 }],
     },
     options: {
       indexAxis: 'y', responsive: true, maintainAspectRatio: false,

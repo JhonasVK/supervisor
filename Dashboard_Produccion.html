@@ -4,19 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Informe de Produccion · COBRA</title>
-<meta name="theme-color" content="#003c71">
+<meta name="theme-color" content="#003575">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <script>try{if(!sessionStorage.getItem('supAuth_v1'))document.documentElement.style.visibility='hidden'}catch(e){}</script>
 <script src="auth.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@200;300;400;500;600;700&display=swap">
 <style>
-  :root{ --bg:#eef1f4; --panel:#fff; --panel-2:#f5f7f9; --border:#e0e5ea; --text:#22303f; --text-dim:#6b7a8c;
-    --cobra-navy:#003c71; --cobra-blue:#0071ce; --celeste:#29a9e0; --celeste-soft:#e8f6fd; --promotor:#1fa971; --neutro:#e2962e; --detractor:#e2523e; }
+  :root{ --bg:#f2f2f2; --panel:#fff; --panel-2:#f7f8fa; --border:#d9dbe0; --text:#334155; --text-dim:#62646e;
+    --cobra-navy:#003575; --cobra-blue:#3c62ac; --celeste:#3c62ac; --celeste-soft:#eef2f9; --promotor:#1f7a45; --neutro:#c77700; --detractor:#c0392b; }
   *{box-sizing:border-box;}
   body{ margin:0; font-family:'Segoe UI', Arial, sans-serif; background:var(--bg); color:var(--text); -webkit-font-smoothing:antialiased; }
-  header.hero{ background:linear-gradient(120deg,#fff 0%,var(--celeste-soft) 55%,#dcf1fb 100%); padding:34px 6vw 40px; position:relative; overflow:hidden; border-bottom:4px solid var(--celeste); }
-  header.hero::after{ content:""; position:absolute; right:-100px; top:-100px; width:340px; height:340px; border-radius:50%; background:radial-gradient(circle, rgba(41,169,224,0.18), transparent 70%); }
+  header.hero{ background:linear-gradient(120deg,#fff 0%,var(--celeste-soft) 55%,#e3e9f4 100%); padding:34px 6vw 40px; position:relative; overflow:hidden; border-bottom:4px solid var(--celeste); }
+  header.hero::after{ content:""; position:absolute; right:-100px; top:-100px; width:340px; height:340px; border-radius:50%; background:radial-gradient(circle, rgba(60,98,172,0.18), transparent 70%); }
   .back-link{ display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:var(--cobra-navy); text-decoration:none; margin-bottom:14px; }
   .back-link:hover{ text-decoration:underline; }
   .brand-row{ display:flex; align-items:center; gap:18px; margin-bottom:22px; }
@@ -36,7 +39,7 @@
   .kpi-card .sub{ font-size:12px; color:var(--text-dim); margin-top:6px; }
   section{ margin-bottom:44px; }
   .section-title{ display:flex; align-items:baseline; gap:10px; margin-bottom:6px; }
-  .section-title .num{ font-size:13px; font-weight:800; color:var(--celeste); background:rgba(41,169,224,0.12); border:1px solid rgba(41,169,224,.35); border-radius:6px; padding:2px 8px; }
+  .section-title .num{ font-size:13px; font-weight:800; color:var(--celeste); background:rgba(60,98,172,0.12); border:1px solid rgba(60,98,172,.35); border-radius:6px; padding:2px 8px; }
   .section-title h2{ margin:0; font-size:20px; font-weight:750; color:var(--cobra-navy); }
   .section-desc{ color:var(--text-dim); font-size:13.5px; margin:0 0 18px; max-width:820px; line-height:1.55; }
   .panel{ background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:22px 24px 14px; box-shadow:0 4px 14px rgba(20,50,80,.05); }
@@ -58,6 +61,64 @@
   .val-bad{ color:var(--detractor); font-weight:800; }
   footer{ text-align:center; padding:26px; color:var(--text-dim); font-size:12px; border-top:1px solid var(--border); }
   canvas{ max-width:100%; }
+
+  /* ================= Formato Academia Tecnica (ver diseno-academia.json) =================
+     Azul marino + ambar, esquinas rectas, titulos livianos, tablas con encabezado marino. */
+  body{ font-family:"Helvetica Neue","Hanken Grotesk",Helvetica,Arial,sans-serif; font-size:15px; line-height:1.55; }
+  header.hero{
+    background:linear-gradient(90deg,#003575 0%,#003575 34%,rgba(0,53,117,.84) 52%,rgba(0,53,117,.38) 74%,rgba(0,53,117,.12) 100%),
+               url("fondo-portada.jpg") 70% 24% / cover no-repeat #003575;
+    border-bottom:0; padding:40px 6vw 78px; color:#ffffff;
+  }
+  header.hero::after{ display:none; }
+  .brand-row img{ background:#ffffff; padding:6px 12px; height:44px; }
+  .brand-divider{ background:rgba(255,255,255,.3); }
+  .eyebrow{ color:#9fc2f0; font-weight:600; font-size:12px; }
+  h1{ color:#ffffff; font-weight:200; font-size:clamp(32px,4.6vw,52px); letter-spacing:.01em; line-height:1.08; margin-bottom:10px; }
+  .subtitle{ color:#c9d7ee; font-weight:300; font-size:17px; }
+  .meta-row{ color:#c9d7ee; }
+  .meta-row b, .meta-row span b{ color:#ffffff; }
+  .back-link{ color:#ffffff; font-weight:600; letter-spacing:.1em; text-transform:uppercase; font-size:12px; }
+  .archive-row .archive-label{ color:#9fc2f0; }
+  .archive-pill{ border-radius:2px; border-color:rgba(255,255,255,.4); background:transparent; color:#ffffff; font-weight:600; }
+  .archive-pill:hover{ background:rgba(255,255,255,.14); }
+  .archive-pill.current{ background:#f0a500; border-color:#f0a500; color:#1d1a12; }
+
+  .kpi-card{ border:0; border-top:3px solid #003575; border-radius:0; box-shadow:0 14px 30px -22px rgba(0,53,117,.55); }
+  .kpi-card .label{ font-weight:600; letter-spacing:.1em; font-size:11px; }
+  .kpi-card .value{ font-weight:200; font-size:40px; font-variant-numeric:tabular-nums; }
+
+  .section-title{ align-items:center; margin-bottom:10px; }
+  .section-title .num{ background:#003575; color:#ffffff; border:0; border-radius:0; font-weight:600; padding:4px 9px; }
+  .section-title h2{ font-weight:300; font-size:26px; }
+  .section-desc{ font-size:15px; }
+
+  .panel{ border:0; border-radius:0; box-shadow:none; }
+  table{ font-size:14px; }
+  th{ background:#003575; color:#ffffff; font-weight:600; letter-spacing:.1em; font-size:11px; border-bottom:0; }
+  th.sortable:hover, th.sorted{ color:#ffd27a; }
+  td{ border-bottom:1px solid #d9dbe0; }
+  .badge{ border-radius:0; font-weight:600; letter-spacing:.06em; padding:4px 8px; }
+
+  .callout, .callout.warn{ border-left:3px solid #f0a500; background:#fdf1d8; border-radius:0; color:#334155; }
+  .rec-item{ border-radius:0; border:0; border-left:3px solid #003575; background:#f7f8fa; }
+  .rec-item .idx{ border-radius:0; background:#003575; }
+  .tech-card{ border-radius:0; box-shadow:none; }
+  .tech-quote{ border-radius:0; }
+
+  footer{ background:#003575; color:#c9d7ee; border-top:0; letter-spacing:.1em; text-transform:uppercase; font-weight:300; }
+  .export-pdf-btn{ border-radius:2px; background:#f0a500; color:#1d1a12; box-shadow:none; letter-spacing:.06em; text-transform:uppercase; font-size:12.5px; font-weight:600; }
+  .export-pdf-btn:hover{ background:#ffb61a; transform:none; }
+  .easter-toast{ border-radius:0; border-left:3px solid #f0a500; background:#00224d; }
+  .easter-game-final button{ border-radius:2px; background:#f0a500; color:#1d1a12; }
+
+  @media print{
+    header.hero{ background:#ffffff; color:#334155; border-bottom:2px solid #003575; padding-bottom:20px; }
+    h1{ color:#003575; } .eyebrow{ color:#3c62ac; } .subtitle, .meta-row{ color:#334155; } .meta-row b, .meta-row span b{ color:#003575; }
+    .back-link{ color:#003575; } .brand-row img{ padding:0; }
+    th{ background:#003575 !important; color:#ffffff !important; }
+    footer{ background:#ffffff; color:#62646e; }
+  }
 </style>
 </head>
 <body>
@@ -98,7 +159,7 @@
 <footer id="footerText"></footer>
 
 <script>
-const DATA = {"periodo":"Septiembre 2026","generadoEl":"01-10-2026, 11:12:37 a. m.","meta":5,"kpis":{"productos":2733,"tecnicos":21,"ordenes":1816,"prodDia":6.1},"agencias":[{"agencia":"Punta Arenas","tecnicos":18,"ordenes":1566,"instala":1390,"repara":869,"productos":2259,"prodDia":6},{"agencia":"Coyhaique","tecnicos":3,"ordenes":250,"instala":401,"repara":73,"productos":474,"prodDia":6.7}],"tecnicos":[{"nombre":"Victor Hugo Barria Almonacid","agencia":"Punta Arenas","ordenes":151,"instala":110,"repara":92,"productos":202,"dias":24,"prodDia":8.4},{"nombre":"Axel Leonardo Alfaro Alvarez","agencia":"Coyhaique","ordenes":87,"instala":138,"repara":26,"productos":164,"dias":23,"prodDia":7.1},{"nombre":"Julio Lopez Cortes","agencia":"Coyhaique","ordenes":89,"instala":133,"repara":27,"productos":160,"dias":24,"prodDia":6.7},{"nombre":"Rodrigo Eduardo Godoy Carcamo","agencia":"Punta Arenas","ordenes":109,"instala":96,"repara":61,"productos":157,"dias":23,"prodDia":6.8},{"nombre":"Marcos Alejandro Aguilar Roa","agencia":"Punta Arenas","ordenes":97,"instala":113,"repara":43,"productos":156,"dias":24,"prodDia":6.5},{"nombre":"Egon Rodrigo Villarroel Zuniga","agencia":"Punta Arenas","ordenes":100,"instala":107,"repara":45,"productos":152,"dias":24,"prodDia":6.3},{"nombre":"Luis Eduardo Cisternas Oyarzo","agencia":"Coyhaique","ordenes":74,"instala":130,"repara":20,"productos":150,"dias":24,"prodDia":6.3},{"nombre":"Miguel Alejandro Alvarado Vivar","agencia":"Punta Arenas","ordenes":94,"instala":103,"repara":44,"productos":147,"dias":24,"prodDia":6.1},{"nombre":"Roberto Esteban Diaz Garrido","agencia":"Punta Arenas","ordenes":98,"instala":96,"repara":48,"productos":144,"dias":24,"prodDia":6},{"nombre":"Luis Alfonso Barrientos Munoz","agencia":"Punta Arenas","ordenes":98,"instala":87,"repara":55,"productos":142,"dias":24,"prodDia":5.9},{"nombre":"Rene Eduardo Mayorga Leuquen","agencia":"Punta Arenas","ordenes":102,"instala":77,"repara":63,"productos":140,"dias":24,"prodDia":5.8},{"nombre":"Luis Alfonso Torres Millaquen","agencia":"Punta Arenas","ordenes":90,"instala":91,"repara":46,"productos":137,"dias":23,"prodDia":6},{"nombre":"Juan Carlos Ulloa Moraga","agencia":"Punta Arenas","ordenes":82,"instala":88,"repara":43,"productos":131,"dias":24,"prodDia":5.5},{"nombre":"Gonzalo Rodrigo Carcamo Maldonado","agencia":"Punta Arenas","ordenes":89,"instala":71,"repara":55,"productos":126,"dias":24,"prodDia":5.3},{"nombre":"Gabriel Leonidas Ramirez Ibarra","agencia":"Punta Arenas","ordenes":78,"instala":100,"repara":26,"productos":126,"dias":19,"prodDia":6.6},{"nombre":"Carlos Alfonso Pinto Aguilar","agencia":"Punta Arenas","ordenes":65,"instala":65,"repara":34,"productos":99,"dias":19,"prodDia":5.2},{"nombre":"Eduardo Andres Witto Mansilla","agencia":"Punta Arenas","ordenes":83,"instala":25,"repara":71,"productos":96,"dias":21,"prodDia":4.6},{"nombre":"Carlos Roberto Saldivia Hernandez","agencia":"Punta Arenas","ordenes":61,"instala":54,"repara":32,"productos":86,"dias":19,"prodDia":4.5},{"nombre":"Felipe Antonio Rios Cifuentes","agencia":"Punta Arenas","ordenes":57,"instala":35,"repara":39,"productos":74,"dias":14,"prodDia":5.3},{"nombre":"Roniel Jesus Diaz Suarez","agencia":"Punta Arenas","ordenes":63,"instala":30,"repara":44,"productos":74,"dias":13,"prodDia":5.7},{"nombre":"Jose Alexis Barria Almonacid","agencia":"Punta Arenas","ordenes":49,"instala":42,"repara":28,"productos":70,"dias":8,"prodDia":8.8}]};
+const DATA = {"periodo":"Septiembre 2026","generadoEl":"01-10-2026, 1:48:55 p. m.","meta":5,"kpis":{"productos":2733,"tecnicos":21,"ordenes":1816,"prodDia":6.1},"agencias":[{"agencia":"Punta Arenas","tecnicos":18,"ordenes":1566,"instala":1390,"repara":869,"productos":2259,"prodDia":6},{"agencia":"Coyhaique","tecnicos":3,"ordenes":250,"instala":401,"repara":73,"productos":474,"prodDia":6.7}],"tecnicos":[{"nombre":"Victor Hugo Barria Almonacid","agencia":"Punta Arenas","ordenes":151,"instala":110,"repara":92,"productos":202,"dias":24,"prodDia":8.4},{"nombre":"Axel Leonardo Alfaro Alvarez","agencia":"Coyhaique","ordenes":87,"instala":138,"repara":26,"productos":164,"dias":23,"prodDia":7.1},{"nombre":"Julio Lopez Cortes","agencia":"Coyhaique","ordenes":89,"instala":133,"repara":27,"productos":160,"dias":24,"prodDia":6.7},{"nombre":"Rodrigo Eduardo Godoy Carcamo","agencia":"Punta Arenas","ordenes":109,"instala":96,"repara":61,"productos":157,"dias":23,"prodDia":6.8},{"nombre":"Marcos Alejandro Aguilar Roa","agencia":"Punta Arenas","ordenes":97,"instala":113,"repara":43,"productos":156,"dias":24,"prodDia":6.5},{"nombre":"Egon Rodrigo Villarroel Zuniga","agencia":"Punta Arenas","ordenes":100,"instala":107,"repara":45,"productos":152,"dias":24,"prodDia":6.3},{"nombre":"Luis Eduardo Cisternas Oyarzo","agencia":"Coyhaique","ordenes":74,"instala":130,"repara":20,"productos":150,"dias":24,"prodDia":6.3},{"nombre":"Miguel Alejandro Alvarado Vivar","agencia":"Punta Arenas","ordenes":94,"instala":103,"repara":44,"productos":147,"dias":24,"prodDia":6.1},{"nombre":"Roberto Esteban Diaz Garrido","agencia":"Punta Arenas","ordenes":98,"instala":96,"repara":48,"productos":144,"dias":24,"prodDia":6},{"nombre":"Luis Alfonso Barrientos Munoz","agencia":"Punta Arenas","ordenes":98,"instala":87,"repara":55,"productos":142,"dias":24,"prodDia":5.9},{"nombre":"Rene Eduardo Mayorga Leuquen","agencia":"Punta Arenas","ordenes":102,"instala":77,"repara":63,"productos":140,"dias":24,"prodDia":5.8},{"nombre":"Luis Alfonso Torres Millaquen","agencia":"Punta Arenas","ordenes":90,"instala":91,"repara":46,"productos":137,"dias":23,"prodDia":6},{"nombre":"Juan Carlos Ulloa Moraga","agencia":"Punta Arenas","ordenes":82,"instala":88,"repara":43,"productos":131,"dias":24,"prodDia":5.5},{"nombre":"Gonzalo Rodrigo Carcamo Maldonado","agencia":"Punta Arenas","ordenes":89,"instala":71,"repara":55,"productos":126,"dias":24,"prodDia":5.3},{"nombre":"Gabriel Leonidas Ramirez Ibarra","agencia":"Punta Arenas","ordenes":78,"instala":100,"repara":26,"productos":126,"dias":19,"prodDia":6.6},{"nombre":"Carlos Alfonso Pinto Aguilar","agencia":"Punta Arenas","ordenes":65,"instala":65,"repara":34,"productos":99,"dias":19,"prodDia":5.2},{"nombre":"Eduardo Andres Witto Mansilla","agencia":"Punta Arenas","ordenes":83,"instala":25,"repara":71,"productos":96,"dias":21,"prodDia":4.6},{"nombre":"Carlos Roberto Saldivia Hernandez","agencia":"Punta Arenas","ordenes":61,"instala":54,"repara":32,"productos":86,"dias":19,"prodDia":4.5},{"nombre":"Felipe Antonio Rios Cifuentes","agencia":"Punta Arenas","ordenes":57,"instala":35,"repara":39,"productos":74,"dias":14,"prodDia":5.3},{"nombre":"Roniel Jesus Diaz Suarez","agencia":"Punta Arenas","ordenes":63,"instala":30,"repara":44,"productos":74,"dias":13,"prodDia":5.7},{"nombre":"Jose Alexis Barria Almonacid","agencia":"Punta Arenas","ordenes":49,"instala":42,"repara":28,"productos":70,"dias":8,"prodDia":8.8}]};
 
 document.getElementById('metaRow').innerHTML = 'Periodo: <b>' + DATA.periodo + '</b> &nbsp;&middot;&nbsp; <b>' + DATA.kpis.tecnicos + '</b> tecnicos &nbsp;&middot;&nbsp; Generado ' + DATA.generadoEl;
 document.getElementById('metaTxt').textContent = DATA.meta;
@@ -184,7 +245,7 @@ document.getElementById('kpiGrid').innerHTML = [
     type: 'bar',
     data: {
       labels: top.map(function (t) { return t.nombre; }),
-      datasets: [{ label: 'Productos totales', data: top.map(function (t) { return t.productos; }), backgroundColor: 'rgba(0,113,206,0.85)', borderRadius: 6, maxBarThickness: 34 }],
+      datasets: [{ label: 'Productos totales', data: top.map(function (t) { return t.productos; }), backgroundColor: 'rgba(60,98,172,0.85)', borderRadius: 6, maxBarThickness: 34 }],
     },
     options: {
       indexAxis: 'y', responsive: true, maintainAspectRatio: false,
