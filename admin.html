@@ -320,7 +320,7 @@ const Acceso = (() => {
 const CFG = { url: 'https://enoclwynrxaizjgvqhim.supabase.co', key: 'sb_publishable_aoJKG0x8aVtY6GSyWIwfCw_awWdTKKN', dominio: 'supervisores.portal.invalid', prueba: '0' === '1' };
 Acceso.configurar({ url: CFG.url, key: CFG.key, dominio: CFG.dominio });
 
-const PAGINAS = { 'supervisor': 'Mi Equipo', 'reincidencias': 'Repetido Reparado', 'infancia': 'Averías de Infancia', 'produccion': 'Producción', 'auditorias': 'Auditorías', 'nps': 'Informe NPS', 'admin': 'Administración / ingresos de técnicos', 'portal antiguo': 'Portal antiguo', '-': '—' };
+const PAGINAS = { 'supervisor': 'Mi Equipo', 'reincidencias': 'Repetido Reparado', 'infancia': 'Averías de Infancia', 'produccion': 'Producción', 'auditorias': 'Auditorías', 'nps': 'Informe NPS', 'graficos': 'Gráficos', 'admin': 'Administración / ingresos de técnicos', 'portal antiguo': 'Portal antiguo', '-': '—' };
 const RESULTADOS = { cambio_clave: ['Definió su clave', 'ok'], ok: ['Ingresó', 'ok'], clave_incorrecta: ['Clave incorrecta', 'bad'], inactivo: ['Usuario desactivado', 'warn'] };
 function etiquetaResultado(r) {
   const m = /^borro_(\d+)_registros$/.exec(r);
