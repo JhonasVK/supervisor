@@ -1,0 +1,156 @@
+@echo off
+setlocal
+cd /d "%~dp0"
+
+where node >nul 2>nul
+if errorlevel 1 (
+    echo.
+    echo No se encontro Node.js instalado en este equipo.
+    echo Descargalo desde https://nodejs.org e instalalo, luego vuelve a intentar.
+    echo.
+    pause
+    exit /b 1
+)
+
+echo Generando informe de Repetido Reparado...
+echo.
+node generar_reincidencias.js
+if errorlevel 1 (
+    echo.
+    echo Ocurrio un error generando el informe de Repetido Reparado. Revisa el mensaje de arriba.
+    pause
+    exit /b 1
+)
+
+echo.
+echo Generando informe de Averias de Infancia...
+echo.
+node generar_infancia.js
+if errorlevel 1 (
+    echo.
+    echo Ocurrio un error generando el informe de Averias de Infancia. Revisa el mensaje de arriba.
+    pause
+    exit /b 1
+)
+
+echo.
+echo Generando resumen para correo...
+echo.
+if exist Resumen_Diario_Correo.png del Resumen_Diario_Correo.png
+node generar_resumen_correo.js
+if exist Resumen_Diario_Correo.png (
+    echo ==^> OK: Resumen_Diario_Correo.png generado correctamente.
+) else (
+    echo ==^> AVISO: no se genero Resumen_Diario_Correo.png. Revisa los mensajes de arriba.
+)
+
+echo.
+echo Copiando INF-09 (produccion / productividad) desde OneDrive...
+echo.
+call copiar_baremos.bat
+
+echo.
+echo Generando informe de Produccion por tecnicos...
+echo.
+node generar_produccion.js
+if errorlevel 1 (
+    echo.
+    echo Ocurrio un error generando el informe de Produccion. Revisa el mensaje de arriba.
+    pause
+    exit /b 1
+)
+
+REM El indice antiguo (generar_indice.js) ya no se usa: la portada es "Mi Equipo"
+REM del Portal Supervisor cifrado, que se genera despues del Portal de Tecnicos.
+
+echo.
+echo Generando Portal de Tecnicos...
+echo.
+pushd portal-tecnicos
+node generar_portal.js
+if errorlevel 1 (
+    echo.
+    echo Ocurrio un error generando el Portal de Tecnicos. Revisa el mensaje de arriba.
+    popd
+    pause
+    exit /b 1
+)
+popd
+
+echo.
+echo Generando Portal Supervisor (paginas cifradas)...
+echo.
+node "C:\Bases_Tigo\portal-supervisor\generar.js" publicar
+if errorlevel 1 (
+    echo.
+    echo Ocurrio un error generando el Portal Supervisor. Revisa el mensaje de arriba.
+    echo No se publica nada.
+    pause
+    exit /b 1
+)
+
+echo.
+echo ========================================================
+echo   Publicando en GitHub Pages...
+echo ========================================================
+echo.
+
+git --version >nul 2>&1
+if errorlevel 1 (
+    echo No se encontro Git instalado. Los informes se generaron localmente
+    echo pero no se publicaron. Descarga Git desde https://git-scm.com
+    pause
+    exit /b 0
+)
+
+for /f "tokens=1-3 delims=/" %%a in ('date /t') do set FECHA=%%c-%%b-%%a
+for /f "tokens=1-2 delims=: " %%a in ('time /t') do set HORA=%%a:%%b
+
+where gh >nul 2>nul
+if not errorlevel 1 (
+    gh auth switch --hostname github.com --user JhonasVK >nul 2>nul
+)
+
+echo [Supervisor] Registrando cambios...
+git add .
+git commit -m "Actualizacion %FECHA% %HORA%"
+
+echo [Supervisor] Subiendo a GitHub...
+git push origin master
+if errorlevel 1 (
+    echo.
+    echo No se pudo subir "Supervisor" a GitHub. Verifica tu conexion, o si no habia
+    echo cambios nuevos que publicar, esto es normal.
+)
+
+echo.
+echo [Portal Tecnicos] Registrando cambios...
+pushd portal-tecnicos
+
+where gh >nul 2>nul
+if not errorlevel 1 (
+    gh auth switch --hostname github.com --user supervisionenaccion-stack >nul 2>nul
+)
+
+git add .
+git commit -m "Actualizacion %FECHA% %HORA%"
+
+echo [Portal Tecnicos] Subiendo a GitHub...
+git push origin master
+if errorlevel 1 (
+    echo.
+    echo No se pudo subir "Portal Tecnicos" a GitHub. Verifica tu conexion, o si no habia
+    echo cambios nuevos que publicar, esto es normal.
+)
+popd
+
+echo.
+echo ========================================================
+echo   Listo! Informes actualizados y publicados
+echo ========================================================
+echo.
+echo  Supervisor:      https://jhonasvk.github.io/supervisor/
+echo  Portal Tecnicos: https://supervisionenaccion-stack.github.io/portal-tecnicos/
+echo  (la version web tarda ~1 minuto en actualizarse)
+echo.
+pause

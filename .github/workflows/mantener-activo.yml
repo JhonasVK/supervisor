@@ -1,0 +1,23 @@
+# Consulta diaria a Supabase (proyecto portal-supervisor) para que el plan gratuito
+# no se pause por inactividad (7 días). No inicia sesión: llama a una función pública
+# que solo responde "true" y toca la base de datos.
+name: Mantener Supabase activo
+
+on:
+  schedule:
+    - cron: "0 11 * * *"   # todos los días a las 11:00 UTC (≈ 08:00 en Chile)
+  workflow_dispatch:        # permite ejecutarlo a mano desde la pestaña Actions
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Consultar Supabase
+        run: |
+          respuesta=$(curl -sS --fail -X POST \
+            "https://enoclwynrxaizjgvqhim.supabase.co/rest/v1/rpc/ping" \
+            -H "apikey: sb_publishable_aoJKG0x8aVtY6GSyWIwfCw_awWdTKKN" \
+            -H "Content-Type: application/json" \
+            -d '{}')
+          echo "Respuesta: $respuesta"
+          test "$respuesta" = "true"
